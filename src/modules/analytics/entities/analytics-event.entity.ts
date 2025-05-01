@@ -1,11 +1,13 @@
-// src/modules/analytics/entities/analytics-event.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  OneToOne,
+  JoinColumn,
   Index,
 } from 'typeorm';
+import { AnalyticsEventData } from './analytics-event-data.entity';
 
 export enum AnalyticsEventType {
   PAGE_VIEW = 'page_view',
@@ -49,8 +51,11 @@ export class AnalyticsEvent {
   @Column({ nullable: true })
   resourceType: string;
 
-  @Column('jsonb', { default: {} })
-  data: any;
+  @OneToOne(() => AnalyticsEventData, eventData => eventData.event, {
+    cascade: true,
+    eager: true,
+  })
+  eventData: AnalyticsEventData;
 
   @Column({ nullable: true })
   userAgent: string;

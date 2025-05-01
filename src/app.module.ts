@@ -16,6 +16,8 @@ import { VerificationModule } from './modules/verification/verification.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
+import { SpotSwapModule } from './modules/spotswap/spotswap.module';
 
 @Module({
   imports: [
@@ -52,6 +54,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     AnalyticsModule,
     PricingModule,
     VerificationModule,
+    SubscriptionsModule,
+    SpotSwapModule,
 
   ],
   controllers: [],

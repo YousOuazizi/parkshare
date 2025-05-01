@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PriceRule } from '../entities/price-rule.entity';
 import { Parking } from '../entities/parking.entity';
+import { AppliedPriceRule } from '../../bookings/entities/applied-price-rule.entity';
 import { CreatePriceRuleDto } from '../dto/create-price-rule.dto';
 import { UpdatePriceRuleDto } from '../dto/update-price-rule.dto';
 
@@ -93,7 +94,7 @@ export class PriceRulesService {
   }
 
   async updateBasePrice(parkingId: string, newBasePrice: number): Promise<Parking> {
-    // Changé de this.findOne à parkingsRepository.findOne
+    // Chercher le parking
     const parking = await this.parkingsRepository.findOne({
       where: { id: parkingId },
     });
@@ -111,7 +112,7 @@ export class PriceRulesService {
     parkingId: string,
     startDateTime: Date,
     endDateTime: Date
-  ): Promise<{ basePrice: number; finalPrice: number; appliedRules: PriceRule[] }> {
+  ): Promise<{ basePrice: number; finalPrice: number; appliedRules: AppliedPriceRule[] }> {
     const parking = await this.parkingsRepository.findOne({
       where: { id: parkingId },
     });
@@ -134,7 +135,7 @@ export class PriceRulesService {
     
     // Appliquer les règles de prix
     let finalPrice = basePrice;
-    const appliedRules: PriceRule[] = [];
+    const appliedRules: AppliedPriceRule[] = [];
     
     for (const rule of rules) {
       let isApplicable = false;
@@ -184,8 +185,19 @@ export class PriceRulesService {
       }
       
       if (isApplicable) {
+        const priceBeforeRule = finalPrice;
         finalPrice = finalPrice * rule.factor;
-        appliedRules.push(rule);
+        const effectOnPrice = finalPrice - priceBeforeRule;
+        
+        // Créer un objet AppliedPriceRule (mais ne pas le sauvegarder en base encore)
+        const appliedRule = new AppliedPriceRule();
+        appliedRule.priceRuleId = rule.id;
+        appliedRule.ruleName = rule.name || rule.type;
+        appliedRule.factor = rule.factor;
+        appliedRule.ruleType = rule.type;
+        appliedRule.effectOnPrice = effectOnPrice;
+        
+        appliedRules.push(appliedRule);
       }
     }
     
