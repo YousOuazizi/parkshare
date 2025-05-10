@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 import {
   AnalyticsEvent,
   AnalyticsEventType,
 } from './entities/analytics-event.entity';
+import { AnalyticsEventData } from './entities/analytics-event-data.entity';
 import { CreateAnalyticsEventDto } from './dto/create-analytics-event.dto';
 import { Request } from 'express';
 import { RequestWithUser } from 'src/core/interfaces/request-with-user.interface';
@@ -32,15 +33,23 @@ export class AnalyticsService {
     // Créer l'événement d'analyse
     const event = new AnalyticsEvent();
     event.type = type;
-    event.userId = userId || ''; // Utiliser chaîne vide si userId est undefined
-    event.sessionId = sessionId || ''; // Utiliser chaîne vide si sessionId est undefined
-    event.resourceId = resourceId || ''; // Utiliser chaîne vide si resourceId est undefined
-    event.resourceType = resourceType || ''; // Utiliser chaîne vide si resourceType est undefined
-    event.data = data || {}; // Utiliser un objet vide si data est undefined
-    event.userAgent = userAgent || ''; // Utiliser chaîne vide si userAgent est undefined
-    event.ipAddress = ipAddress || ''; // Utiliser chaîne vide si ipAddress est undefined
-    event.referrer = referrer || ''; // Utiliser chaîne vide si referrer est undefined
+    event.userId = userId || ''; 
+    event.sessionId = sessionId || ''; 
+    event.resourceId = resourceId || ''; 
+    event.resourceType = resourceType || ''; 
+    event.userAgent = userAgent || ''; 
+    event.ipAddress = ipAddress || ''; 
+    event.referrer = referrer || ''; 
 
+    // Créer et associer les données de l'événement si nécessaire
+    if (data) {
+      const eventData = new AnalyticsEventData();
+      eventData.data = data;
+      eventData.event = event;
+      event.eventData = eventData;
+    }
+
+    // Sauvegarder l'événement avec cascade qui sauvegarde automatiquement eventData
     return this.analyticsRepository.save(event);
   }
 

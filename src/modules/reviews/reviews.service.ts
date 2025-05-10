@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, ConflictException, ForbiddenException, B
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Review, ReviewType } from './entities/review.entity';
+import { ReviewCriteria } from './entities/review-criteria.entity';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto, ReplyReviewDto, ReportReviewDto } from './dto/update-review.dto';
 import { BookingsService } from '../bookings/bookings.service';
@@ -21,7 +22,7 @@ export class ReviewsService {
   ) {}
 
   async create(authorId: string, createReviewDto: CreateReviewDto): Promise<Review> {
-    const { bookingId, type, parkingId, targetUserId, rating, comment, criteria } = createReviewDto;
+    const { bookingId, type, rating, comment, criteria } = createReviewDto;
     
     // Vérifier si la réservation existe et est terminée
     const booking = await this.bookingsService.findOne(bookingId);
@@ -30,8 +31,7 @@ export class ReviewsService {
       throw new BadRequestException('Vous ne pouvez laisser un avis que pour une réservation terminée');
     }
     
-    // Vérifier que l'auteur est bien l'utilisateur qui a fait la réservation
-    // ou le propriétaire du parking (selon le type d'avis)
+    // Vérifier permissions selon type d'avis
     if (type === ReviewType.PARKING) {
       if (booking.userId !== authorId) {
         throw new ForbiddenException('Vous ne pouvez laisser un avis que pour vos propres réservations');
@@ -43,7 +43,7 @@ export class ReviewsService {
       }
     }
     
-    // Vérifier si un avis existe déjà pour cette réservation et ce type
+    // Vérifier si un avis existe déjà
     const existingReview = await this.reviewsRepository.findOne({
       where: {
         bookingId,
@@ -66,11 +66,22 @@ export class ReviewsService {
     review.isVerified = false;
     review.parkingId = type === ReviewType.PARKING ? booking.parkingId : '';
     review.targetUserId = type === ReviewType.USER ? booking.userId : '';
-    review.criteria = criteria || {};
     
+    // Ajouter les critères si fournis
+    if (criteria) {
+      const reviewCriteria = new ReviewCriteria();
+      // Assigner les propriétés des critères
+      // Par exemple: cleanliness, accuracy, etc.
+      Object.assign(reviewCriteria, criteria);
+      
+      // Associer les critères à l'avis
+      review.criteria = reviewCriteria;
+    }
+    
+    // Sauvegarder l'avis (et les critères grâce à cascade: true)
     const savedReview = await this.reviewsRepository.save(review);
     
-    // Envoyer une notification au destinataire de l'avis
+    // Notification
     if (type === ReviewType.PARKING) {
       const parking = await this.parkingsService.findOne(booking.parkingId);
       await this.notificationsService.create({
@@ -100,8 +111,19 @@ export class ReviewsService {
       });
     }
     
-    return savedReview;
+    // Recharger l'avis avec ses relations
+    const finalReview = await this.reviewsRepository.findOne({
+      where: { id: savedReview.id },
+      relations: ['criteria']
+    });
+    
+    if (!finalReview) {
+      throw new NotFoundException(`Avis avec l'id ${savedReview.id} non trouvé après sauvegarde`);
+    }
+    
+    return finalReview;
   }
+  
   
   async findAll(filters?: any): Promise<Review[]> {
     const query = this.reviewsRepository.createQueryBuilder('review');
@@ -156,9 +178,44 @@ export class ReviewsService {
       throw new BadRequestException('Vous ne pouvez plus modifier cet avis après 48 heures');
     }
     
-    // Mettre à jour l'avis
-    const updatedReview = Object.assign(review, updateReviewDto);
-    return this.reviewsRepository.save(updatedReview);
+    // Mettre à jour les champs de base de l'avis
+    if (updateReviewDto.rating !== undefined) review.rating = updateReviewDto.rating;
+    if (updateReviewDto.comment !== undefined) review.comment = updateReviewDto.comment;
+    
+    // Sauvegarder les modifications de l'avis
+    const updatedReview = await this.reviewsRepository.save(review);
+    
+    // Mettre à jour les critères si fournis
+    if (updateReviewDto.criteria && review.criteria) {
+      const criteria = review.criteria;
+      
+      if (updateReviewDto.criteria.cleanliness !== undefined) 
+        criteria.cleanliness = updateReviewDto.criteria.cleanliness;
+      if (updateReviewDto.criteria.accuracy !== undefined) 
+        criteria.accuracy = updateReviewDto.criteria.accuracy;
+      if (updateReviewDto.criteria.security !== undefined) 
+        criteria.security = updateReviewDto.criteria.security;
+      if (updateReviewDto.criteria.communication !== undefined) 
+        criteria.communication = updateReviewDto.criteria.communication;
+      if (updateReviewDto.criteria.convenience !== undefined) 
+        criteria.convenience = updateReviewDto.criteria.convenience;
+      if (updateReviewDto.criteria.value !== undefined) 
+        criteria.value = updateReviewDto.criteria.value;
+      
+      review.criteria = criteria;
+      await this.reviewsRepository.save(review);    }
+    
+    // Recharger l'avis complet avec les critères et vérifier qu'il existe
+    const finalReview = await this.reviewsRepository.findOne({
+      where: { id },
+      relations: ['criteria']
+    });
+    
+    if (!finalReview) {
+      throw new NotFoundException(`Avis avec l'id ${id} non trouvé après mise à jour`);
+    }
+    
+    return finalReview;
   }
   
   async reply(id: string, userId: string, replyDto: ReplyReviewDto): Promise<Review> {
@@ -216,6 +273,7 @@ export class ReviewsService {
         parkingId,
         type: ReviewType.PARKING,
       },
+      relations: ['criteria']
     });
     
     if (reviews.length === 0) {
@@ -278,12 +336,31 @@ export class ReviewsService {
     
     reviews.forEach(review => {
       if (review.criteria) {
-        Object.keys(review.criteria).forEach(key => {
-          if (criteriaAverages[key] !== undefined && review.criteria[key]) {
-            criteriaAverages[key] += review.criteria[key];
-            criteriaCount[key]++;
-          }
-        });
+        // Vérifier chaque critère individuellement
+        if (review.criteria.cleanliness !== undefined) {
+          criteriaAverages.cleanliness += review.criteria.cleanliness;
+          criteriaCount.cleanliness++;
+        }
+        if (review.criteria.accuracy !== undefined) {
+          criteriaAverages.accuracy += review.criteria.accuracy;
+          criteriaCount.accuracy++;
+        }
+        if (review.criteria.security !== undefined) {
+          criteriaAverages.security += review.criteria.security;
+          criteriaCount.security++;
+        }
+        if (review.criteria.communication !== undefined) {
+          criteriaAverages.communication += review.criteria.communication;
+          criteriaCount.communication++;
+        }
+        if (review.criteria.convenience !== undefined) {
+          criteriaAverages.convenience += review.criteria.convenience;
+          criteriaCount.convenience++;
+        }
+        if (review.criteria.value !== undefined) {
+          criteriaAverages.value += review.criteria.value;
+          criteriaCount.value++;
+        }
       }
     });
     

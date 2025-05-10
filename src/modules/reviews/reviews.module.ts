@@ -6,10 +6,11 @@ import { Review } from './entities/review.entity';
 import { BookingsModule } from '../bookings/bookings.module';
 import { ParkingsModule } from '../parkings/parkings.module';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { ReviewCriteria } from './entities/review-criteria.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Review]),
+    TypeOrmModule.forFeature([Review, ReviewCriteria]),
     BookingsModule,
     ParkingsModule,
     NotificationsModule,

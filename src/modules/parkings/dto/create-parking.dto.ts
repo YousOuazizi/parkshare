@@ -14,8 +14,9 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { AccessMethod } from '../entities/parking.entity';
+import { DayOfWeek } from '../entities/availability-schedule.entity';
 
-class SizeDto {
+export class SizeDto {
   @ApiProperty({ required: false })
   @IsOptional()
   @IsNumber()
@@ -35,7 +36,7 @@ class SizeDto {
   height?: number;
 }
 
-class HoursRangeDto {
+export class HoursRangeDto {
   @ApiProperty({ example: '08:00' })
   @IsString()
   @IsNotEmpty()
@@ -47,7 +48,7 @@ class HoursRangeDto {
   end: string;
 }
 
-class ExceptionDto {
+export class ExceptionDto {
   @ApiProperty({ example: '2023-12-25' })
   @IsString()
   @IsNotEmpty()
@@ -65,7 +66,7 @@ class ExceptionDto {
   hours?: HoursRangeDto[];
 }
 
-class AvailabilityDto {
+export class AvailabilityDto {
   @ApiProperty({ type: [HoursRangeDto], required: false })
   @IsOptional()
   @IsArray()
@@ -197,4 +198,4 @@ export class CreateParkingDto {
   @IsBoolean()
   @IsOptional()
   hasEVCharging?: boolean;
-}
+}  
