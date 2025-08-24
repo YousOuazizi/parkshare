@@ -11,5 +11,6 @@ export const getDatabaseConfig = (
     synchronize: configService.get<string>('environment') === 'development',
     logging: configService.get<string>('environment') === 'development',
     migrations: [__dirname + '/../database/migrations/**/*{.ts,.js}'],
+    // installExtensions: false, // Désactiver PostGIS temporairement
   };
 };

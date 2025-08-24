@@ -18,7 +18,7 @@ import { SearchBookingsDto } from './dto/search-bookings.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { BookingStatus } from './entities/booking.entity';
 import { ApiBearerAuth, ApiOperation, ApiTags, ApiQuery } from '@nestjs/swagger';
-import { RequestWithUser } from 'src/core/interfaces/request-with-user.interface';
+// import { any } from 'src/core/interfaces/request-with-user.interface';
 import { ParkingsService } from '../parkings/services/parkings.service';
 import { VerificationLevel } from '../users/entities/user.entity';
 import { RequiredVerificationLevel } from '../verification/decorators/required-verification-level.decorator';
@@ -36,7 +36,7 @@ export class BookingsController {
   @RequiredVerificationLevel(VerificationLevel.LEVEL_2)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Créer une nouvelle réservation' })
-  create(@Req() req: RequestWithUser, @Body() createBookingDto: CreateBookingDto) {
+  create(@Req() req: any, @Body() createBookingDto: CreateBookingDto) {
     if (!req.user) {
       throw new ForbiddenException('Utilisateur non authentifié');
     }
@@ -47,7 +47,7 @@ export class BookingsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Rechercher des réservations selon des critères' })
-  findAll(@Query() searchBookingsDto: SearchBookingsDto, @Req() req: RequestWithUser) {
+  findAll(@Query() searchBookingsDto: SearchBookingsDto, @Req() req: any) {
     if (!req.user) {
       throw new ForbiddenException('Utilisateur non authentifié');
     }
@@ -62,7 +62,7 @@ export class BookingsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Récupérer une réservation par son ID' })
-  async findOne(@Param('id') id: string, @Req() req: RequestWithUser) {
+  async findOne(@Param('id') id: string, @Req() req: any) {
     if (!req.user) {
       throw new ForbiddenException('Utilisateur non authentifié');
     }
@@ -90,7 +90,7 @@ export class BookingsController {
   @ApiOperation({ summary: 'Mettre à jour une réservation' })
   update(
     @Param('id') id: string,
-    @Req() req: RequestWithUser,
+    @Req() req: any,
     @Body() updateBookingDto: UpdateBookingDto,
   ) {
     if (!req.user) {
@@ -108,7 +108,7 @@ export class BookingsController {
   updateStatus(
     @Param('id') id: string,
     @Query('status') status: BookingStatus,
-    @Req() req: RequestWithUser,
+    @Req() req: any,
   ) {
     if (!req.user) {
       throw new ForbiddenException('Utilisateur non authentifié');
@@ -122,7 +122,7 @@ export class BookingsController {
   @ApiBearerAuth()
   @RequiredVerificationLevel(VerificationLevel.LEVEL_2)
   @ApiOperation({ summary: 'Supprimer une réservation' })
-  remove(@Param('id') id: string, @Req() req: RequestWithUser) {
+  remove(@Param('id') id: string, @Req() req: any) {
     if (!req.user) {
       throw new ForbiddenException('Utilisateur non authentifié');
     }
@@ -134,7 +134,7 @@ export class BookingsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Effectuer le check-in d\'une réservation' })
-  checkIn(@Param('id') id: string, @Req() req: RequestWithUser) {
+  checkIn(@Param('id') id: string, @Req() req: any) {
     if (!req.user) {
       throw new ForbiddenException('Utilisateur non authentifié');
     }
@@ -146,7 +146,7 @@ export class BookingsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Effectuer le check-out d\'une réservation' })
-  checkOut(@Param('id') id: string, @Req() req: RequestWithUser) {
+  checkOut(@Param('id') id: string, @Req() req: any) {
     if (!req.user) {
       throw new ForbiddenException('Utilisateur non authentifié');
     }
@@ -158,7 +158,7 @@ export class BookingsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Générer un code d\'accès pour une réservation' })
-  generateAccessCode(@Param('id') id: string, @Req() req: RequestWithUser) {
+  generateAccessCode(@Param('id') id: string, @Req() req: any) {
     if (!req.user) {
       throw new ForbiddenException('Utilisateur non authentifié');
     }
@@ -170,7 +170,7 @@ export class BookingsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Obtenir les statistiques de réservation d\'un utilisateur' })
-  getUserStats(@Req() req: RequestWithUser) {
+  getUserStats(@Req() req: any) {
     if (!req.user) {
       throw new ForbiddenException('Utilisateur non authentifié');
     }
@@ -182,7 +182,7 @@ export class BookingsController {
   @ApiBearerAuth()
   @RequiredVerificationLevel(VerificationLevel.LEVEL_2)
   @ApiOperation({ summary: 'Obtenir les statistiques de réservation d\'un parking' })
-  async getParkingStats(@Param('parkingId') parkingId: string, @Req() req: RequestWithUser) {
+  async getParkingStats(@Param('parkingId') parkingId: string, @Req() req: any) {
     if (!req.user) {
       throw new ForbiddenException('Utilisateur non authentifié');
     }

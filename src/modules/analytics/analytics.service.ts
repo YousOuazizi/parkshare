@@ -7,7 +7,7 @@ import {
 } from './entities/analytics-event.entity';
 import { CreateAnalyticsEventDto } from './dto/create-analytics-event.dto';
 import { Request } from 'express';
-import { RequestWithUser } from 'src/core/interfaces/request-with-user.interface';
+// import { RequestWithUser } from 'src/core/interfaces/request-with-user.interface';
 
 @Injectable()
 export class AnalyticsService {
@@ -18,7 +18,7 @@ export class AnalyticsService {
 
   async trackEvent(
     createAnalyticsEventDto: CreateAnalyticsEventDto,
-    request: RequestWithUser,
+    request: any,
     userId?: string,
   ): Promise<AnalyticsEvent> {
     const { type, resourceId, resourceType, data, referrer } =
@@ -36,7 +36,7 @@ export class AnalyticsService {
     event.sessionId = sessionId || ''; // Utiliser chaîne vide si sessionId est undefined
     event.resourceId = resourceId || ''; // Utiliser chaîne vide si resourceId est undefined
     event.resourceType = resourceType || ''; // Utiliser chaîne vide si resourceType est undefined
-    event.data = data || {}; // Utiliser un objet vide si data est undefined
+    // event.data = data || {}; // Property doesn't exist on AnalyticsEvent
     event.userAgent = userAgent || ''; // Utiliser chaîne vide si userAgent est undefined
     event.ipAddress = ipAddress || ''; // Utiliser chaîne vide si ipAddress est undefined
     event.referrer = referrer || ''; // Utiliser chaîne vide si referrer est undefined

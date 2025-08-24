@@ -51,14 +51,14 @@ export class Parking {
   @Column('float')
   longitude: number;
 
-  @Index({ spatial: true })
-  @Column({
-    type: 'geography',
-    spatialFeatureType: 'Point',
-    srid: 4326,
-    nullable: true,
-  })
-  location: string;
+  // @Index({ spatial: true })
+  // @Column({
+  //   type: 'geography',
+  //   spatialFeatureType: 'Point',
+  //   srid: 4326,
+  //   nullable: true,
+  // })
+  // location: string;
 
   @OneToOne(() => ParkingSize, size => size.parking, { 
     cascade: true, 

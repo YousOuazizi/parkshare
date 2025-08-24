@@ -62,8 +62,8 @@ export class ParkingsService {
       );
     }
     
-    // Création du point géographique
-    const point = `POINT(${createParkingDto.longitude} ${createParkingDto.latitude})`;
+    // Création du point géographique (désactivé temporairement)
+    // const point = `POINT(${createParkingDto.longitude} ${createParkingDto.latitude})`;
     
     // Création du parking principal
     const parking = this.parkingsRepository.create({
@@ -78,7 +78,7 @@ export class ParkingsService {
       isActive: createParkingDto.isActive !== undefined ? createParkingDto.isActive : true,
       hasEVCharging: createParkingDto.hasEVCharging || false,
       ownerId: userId,
-      location: point,
+      // location: point, // désactivé temporairement
       isVerified: false,
     });
     
@@ -249,12 +249,12 @@ export class ParkingsService {
     if (updateParkingDto.isActive !== undefined) parking.isActive = updateParkingDto.isActive;
     if (updateParkingDto.hasEVCharging !== undefined) parking.hasEVCharging = updateParkingDto.hasEVCharging;
     
-    // Mise à jour du point géographique si nécessaire
+    // Mise à jour du point géographique si nécessaire (désactivé temporairement)
     if (updateParkingDto.latitude !== undefined && updateParkingDto.longitude !== undefined) {
       parking.latitude = updateParkingDto.latitude;
       parking.longitude = updateParkingDto.longitude;
-      const point = `POINT(${updateParkingDto.longitude} ${updateParkingDto.latitude})`;
-      parking.location = point;
+      // const point = `POINT(${updateParkingDto.longitude} ${updateParkingDto.latitude})`;
+      // parking.location = point;
     }
     
     await this.parkingsRepository.save(parking);
@@ -426,19 +426,22 @@ export class ParkingsService {
       .leftJoinAndSelect('exceptions.timeSlots', 'exceptionTimeSlots')
       .where('parking.isActive = :isActive', { isActive: true });
     
-    // Recherche par géolocalisation
+    // Recherche par géolocalisation (désactivé temporairement - utilise une recherche approximative par coordonnées)
     if (searchParams.latitude && searchParams.longitude && searchParams.radius) {
-      const point = `POINT(${searchParams.longitude} ${searchParams.latitude})`;
-      const radiusInMeters = searchParams.radius;
+      // const point = `POINT(${searchParams.longitude} ${searchParams.latitude})`;
+      // const radiusInMeters = searchParams.radius;
+      
+      // Recherche approximative par plage de coordonnées (1 degré ≈ 111 km)
+      const radiusInDegrees = (searchParams.radius / 1000) / 111; // Conversion approximative
       
       query = query
-        .andWhere(`ST_DWithin(
-          parking.location::geography, 
-          ST_GeographyFromText(:point)::geography, 
-          :radius
-        )`, {
-          point: point,
-          radius: radiusInMeters
+        .andWhere(`parking.latitude BETWEEN :minLat AND :maxLat`, {
+          minLat: searchParams.latitude - radiusInDegrees,
+          maxLat: searchParams.latitude + radiusInDegrees
+        })
+        .andWhere(`parking.longitude BETWEEN :minLng AND :maxLng`, {
+          minLng: searchParams.longitude - radiusInDegrees,
+          maxLng: searchParams.longitude + radiusInDegrees
         });
     }
     

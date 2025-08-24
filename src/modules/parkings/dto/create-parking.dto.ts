@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { ApiProperty } from '@nestjs/swagger';
 import { 
   IsNotEmpty, 
@@ -8,36 +7,37 @@ import {
   IsEnum, 
   IsBoolean, 
   IsArray, 
-  ValidateNested, 
-  IsObject,
+  ValidateNested,
   Min,
-  Max 
+  Max,
+  IsLatitude,
+  IsLongitude
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { AccessMethod } from '../entities/parking.entity';
-import { DayOfWeek } from '../entities/availability-schedule.entity';
 
-export class SizeDto {
-  @ApiProperty({ required: false })
+class ParkingSizeDto {
+  @ApiProperty({ description: 'Longueur en mètres' })
+  @IsNumber()
+  @Min(1)
+  @Max(50)
+  length: number;
+
+  @ApiProperty({ description: 'Largeur en mètres' })
+  @IsNumber()
+  @Min(1)
+  @Max(20)
+  width: number;
+
+  @ApiProperty({ description: 'Hauteur en mètres', required: false })
   @IsOptional()
   @IsNumber()
-  @Min(0)
-  length?: number;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
-  width?: number;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
+  @Min(1)
+  @Max(10)
   height?: number;
 }
 
-export class HoursRangeDto {
+class TimeRangeDto {
   @ApiProperty({ example: '08:00' })
   @IsString()
   @IsNotEmpty()
@@ -49,356 +49,152 @@ export class HoursRangeDto {
   end: string;
 }
 
-export class ExceptionDto {
-  @ApiProperty({ example: '2023-12-25' })
+class AvailabilityExceptionDto {
+  @ApiProperty({ example: '2024-12-25' })
   @IsString()
   @IsNotEmpty()
   date: string;
 
-  @ApiProperty({ example: false })
+  @ApiProperty()
   @IsBoolean()
   available: boolean;
 
-  @ApiProperty({ type: [HoursRangeDto], required: false })
+  @ApiProperty({ type: [TimeRangeDto], required: false })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => HoursRangeDto)
-  hours?: HoursRangeDto[];
-}
-
-export class AvailabilityDto {
-  @ApiProperty({ type: [HoursRangeDto], required: false })
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => HoursRangeDto)
-  monday?: HoursRangeDto[];
-
-  @ApiProperty({ type: [HoursRangeDto], required: false })
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => HoursRangeDto)
-  tuesday?: HoursRangeDto[];
-
-  @ApiProperty({ type: [HoursRangeDto], required: false })
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => HoursRangeDto)
-  wednesday?: HoursRangeDto[];
-
-  @ApiProperty({ type: [HoursRangeDto], required: false })
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => HoursRangeDto)
-  thursday?: HoursRangeDto[];
-
-  @ApiProperty({ type: [HoursRangeDto], required: false })
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => HoursRangeDto)
-  friday?: HoursRangeDto[];
-
-  @ApiProperty({ type: [HoursRangeDto], required: false })
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => HoursRangeDto)
-  saturday?: HoursRangeDto[];
-
-  @ApiProperty({ type: [HoursRangeDto], required: false })
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => HoursRangeDto)
-  sunday?: HoursRangeDto[];
-
-  @ApiProperty({ type: [ExceptionDto], required: false })
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => ExceptionDto)
-  exceptions?: ExceptionDto[];
-}
-
-export class CreateParkingDto {
-  @ApiProperty({ example: 'Parking Centre-Ville' })
-  @IsString()
-  @IsNotEmpty()
-  title: string;
-
-  @ApiProperty({ example: 'Magnifique place de parking au centre-ville, facile d\'accès.' })
-  @IsString()
-  @IsNotEmpty()
-  description: string;
-
-  @ApiProperty({ example: '15 rue de la Paix, 75002 Paris' })
-  @IsString()
-  @IsNotEmpty()
-  address: string;
-
-  @ApiProperty({ example: 48.8566 })
-  @IsNumber()
-  @Min(-90)
-  @Max(90)
-  latitude: number;
-
-  @ApiProperty({ example: 2.3522 })
-  @IsNumber()
-  @Min(-180)
-  @Max(180)
-  longitude: number;
-
-  @ApiProperty({ type: SizeDto })
-  @IsObject()
-  @ValidateNested()
-  @Type(() => SizeDto)
-  size: SizeDto;
-
-  @ApiProperty({ example: ['covered', 'secure', 'camera'] })
-  @IsArray()
-  @IsString({ each: true })
-  features: string[];
-
-  @ApiProperty({ example: ['https://example.com/photo1.jpg'] })
-  @IsArray()
-  @IsString({ each: true })
-  photos: string[];
-
-  @ApiProperty({ example: 5.5 })
-  @IsNumber()
-  @Min(0)
-  basePrice: number;
-
-  @ApiProperty({ example: 'EUR', default: 'EUR' })
-  @IsString()
-  @IsOptional()
-  currency?: string;
-
-  @ApiProperty({ type: AvailabilityDto })
-  @IsObject()
-  @ValidateNested()
-  @Type(() => AvailabilityDto)
-  availability: AvailabilityDto;
-
-  @ApiProperty({ enum: AccessMethod, default: AccessMethod.CODE })
-  @IsEnum(AccessMethod)
-  @IsOptional()
-  accessMethod?: AccessMethod;
-
-  @ApiProperty({ default: true })
-  @IsBoolean()
-  @IsOptional()
-  isActive?: boolean;
-
-  @ApiProperty({ default: false })
-  @IsBoolean()
-  @IsOptional()
-  hasEVCharging?: boolean;
-}  
-=======
-import { ApiProperty } from '@nestjs/swagger';
-import { 
-  IsNotEmpty, 
-  IsString, 
-  IsNumber, 
-  IsOptional, 
-  IsEnum, 
-  IsBoolean, 
-  IsArray, 
-  ValidateNested, 
-  IsObject,
-  Min,
-  Max 
-} from 'class-validator';
-import { Type } from 'class-transformer';
-import { AccessMethod } from '../entities/parking.entity';
-
-class SizeDto {
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
-  length?: number;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
-  width?: number;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
-  height?: number;
-}
-
-class HoursRangeDto {
-  @ApiProperty({ example: '08:00' })
-  @IsString()
-  @IsNotEmpty()
-  start: string;
-
-  @ApiProperty({ example: '18:00' })
-  @IsString()
-  @IsNotEmpty()
-  end: string;
-}
-
-class ExceptionDto {
-  @ApiProperty({ example: '2023-12-25' })
-  @IsString()
-  @IsNotEmpty()
-  date: string;
-
-  @ApiProperty({ example: false })
-  @IsBoolean()
-  available: boolean;
-
-  @ApiProperty({ type: [HoursRangeDto], required: false })
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => HoursRangeDto)
-  hours?: HoursRangeDto[];
+  @Type(() => TimeRangeDto)
+  hours?: TimeRangeDto[];
 }
 
 class AvailabilityDto {
-  @ApiProperty({ type: [HoursRangeDto], required: false })
+  @ApiProperty({ type: [TimeRangeDto], required: false })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => HoursRangeDto)
-  monday?: HoursRangeDto[];
+  @Type(() => TimeRangeDto)
+  monday?: TimeRangeDto[];
 
-  @ApiProperty({ type: [HoursRangeDto], required: false })
+  @ApiProperty({ type: [TimeRangeDto], required: false })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => HoursRangeDto)
-  tuesday?: HoursRangeDto[];
+  @Type(() => TimeRangeDto)
+  tuesday?: TimeRangeDto[];
 
-  @ApiProperty({ type: [HoursRangeDto], required: false })
+  @ApiProperty({ type: [TimeRangeDto], required: false })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => HoursRangeDto)
-  wednesday?: HoursRangeDto[];
+  @Type(() => TimeRangeDto)
+  wednesday?: TimeRangeDto[];
 
-  @ApiProperty({ type: [HoursRangeDto], required: false })
+  @ApiProperty({ type: [TimeRangeDto], required: false })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => HoursRangeDto)
-  thursday?: HoursRangeDto[];
+  @Type(() => TimeRangeDto)
+  thursday?: TimeRangeDto[];
 
-  @ApiProperty({ type: [HoursRangeDto], required: false })
+  @ApiProperty({ type: [TimeRangeDto], required: false })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => HoursRangeDto)
-  friday?: HoursRangeDto[];
+  @Type(() => TimeRangeDto)
+  friday?: TimeRangeDto[];
 
-  @ApiProperty({ type: [HoursRangeDto], required: false })
+  @ApiProperty({ type: [TimeRangeDto], required: false })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => HoursRangeDto)
-  saturday?: HoursRangeDto[];
+  @Type(() => TimeRangeDto)
+  saturday?: TimeRangeDto[];
 
-  @ApiProperty({ type: [HoursRangeDto], required: false })
+  @ApiProperty({ type: [TimeRangeDto], required: false })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => HoursRangeDto)
-  sunday?: HoursRangeDto[];
+  @Type(() => TimeRangeDto)
+  sunday?: TimeRangeDto[];
 
-  @ApiProperty({ type: [ExceptionDto], required: false })
+  @ApiProperty({ type: [AvailabilityExceptionDto], required: false })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => ExceptionDto)
-  exceptions?: ExceptionDto[];
+  @Type(() => AvailabilityExceptionDto)
+  exceptions?: AvailabilityExceptionDto[];
 }
 
 export class CreateParkingDto {
-  @ApiProperty({ example: 'Parking Centre-Ville' })
+  @ApiProperty({ description: 'Titre du parking' })
   @IsString()
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty({ example: 'Magnifique place de parking au centre-ville, facile d\'accès.' })
+  @ApiProperty({ description: 'Description du parking' })
   @IsString()
   @IsNotEmpty()
   description: string;
 
-  @ApiProperty({ example: '15 rue de la Paix, 75002 Paris' })
+  @ApiProperty({ description: 'Adresse complète' })
   @IsString()
   @IsNotEmpty()
   address: string;
 
-  @ApiProperty({ example: 48.8566 })
-  @IsNumber()
-  @Min(-90)
-  @Max(90)
+  @ApiProperty({ description: 'Latitude' })
+  @IsLatitude()
   latitude: number;
 
-  @ApiProperty({ example: 2.3522 })
-  @IsNumber()
-  @Min(-180)
-  @Max(180)
+  @ApiProperty({ description: 'Longitude' })
+  @IsLongitude()
   longitude: number;
 
-  @ApiProperty({ type: SizeDto })
-  @IsObject()
-  @ValidateNested()
-  @Type(() => SizeDto)
-  size: SizeDto;
-
-  @ApiProperty({ example: ['covered', 'secure', 'camera'] })
-  @IsArray()
-  @IsString({ each: true })
-  features: string[];
-
-  @ApiProperty({ example: ['https://example.com/photo1.jpg'] })
-  @IsArray()
-  @IsString({ each: true })
-  photos: string[];
-
-  @ApiProperty({ example: 5.5 })
+  @ApiProperty({ description: 'Prix de base par heure' })
   @IsNumber()
-  @Min(0)
+  @Min(0.5)
+  @Max(100)
   basePrice: number;
 
-  @ApiProperty({ example: 'EUR', default: 'EUR' })
-  @IsString()
+  @ApiProperty({ description: 'Devise', default: 'EUR' })
   @IsOptional()
+  @IsString()
   currency?: string;
 
-  @ApiProperty({ type: AvailabilityDto })
-  @IsObject()
-  @ValidateNested()
-  @Type(() => AvailabilityDto)
-  availability: AvailabilityDto;
-
-  @ApiProperty({ enum: AccessMethod, default: AccessMethod.CODE })
+  @ApiProperty({ enum: AccessMethod, description: 'Méthode d\'accès' })
   @IsEnum(AccessMethod)
-  @IsOptional()
-  accessMethod?: AccessMethod;
+  accessMethod: AccessMethod;
 
-  @ApiProperty({ default: true })
-  @IsBoolean()
+  @ApiProperty({ description: 'Parking actif', default: true })
   @IsOptional()
+  @IsBoolean()
   isActive?: boolean;
 
-  @ApiProperty({ default: false })
-  @IsBoolean()
+  @ApiProperty({ description: 'Borne de recharge électrique', default: false })
   @IsOptional()
+  @IsBoolean()
   hasEVCharging?: boolean;
+
+  @ApiProperty({ type: ParkingSizeDto, required: false })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => ParkingSizeDto)
+  size?: ParkingSizeDto;
+
+  @ApiProperty({ type: [String], required: false, description: 'Caractéristiques du parking' })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  features?: string[];
+
+  @ApiProperty({ type: [String], required: false, description: 'URLs des photos' })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  photos?: string[];
+
+  @ApiProperty({ type: AvailabilityDto, required: false })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => AvailabilityDto)
+  availability?: AvailabilityDto;
 }
->>>>>>> 4c1eb952a638ddc42b593eb5280621915e9a2ec0

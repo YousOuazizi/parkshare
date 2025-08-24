@@ -3,12 +3,12 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { LoggingInterceptor } from './core/interceptors/logging.interceptor';
-import { HttpExceptionFilter } from './core/filters/http-exception.filter';
-import helmet from 'helmet'; // Modifiez l'import ici
+// import { LoggingInterceptor } from './core/interceptors/logging.interceptor';
+// import { HttpExceptionFilter } from './core/filters/http-exception.filter';
+import helmet from 'helmet';
 import * as compression from 'compression';
 import * as cookieParser from 'cookie-parser';
-import { VerificationRequirementsInterceptor } from './core/interceptors/verification-requirements.interceptor';
+// import { VerificationRequirementsInterceptor } from './core/interceptors/verification-requirements.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -35,10 +35,10 @@ async function bootstrap() {
   app.setGlobalPrefix(apiPrefix);
   
   // Intercepteurs globaux
-  app.useGlobalInterceptors(new LoggingInterceptor());
+  // app.useGlobalInterceptors(new LoggingInterceptor());
   
   // Filtres d'exception globaux
-  app.useGlobalFilters(new HttpExceptionFilter());
+  // app.useGlobalFilters(new HttpExceptionFilter());
   
   // Validation globale des DTOs
   app.useGlobalPipes(
@@ -49,10 +49,10 @@ async function bootstrap() {
     }),
   );
 
-  app.useGlobalInterceptors(
-    new LoggingInterceptor(),
-    new VerificationRequirementsInterceptor(app.get(Reflector)),
-  );
+  // app.useGlobalInterceptors(
+  //   new LoggingInterceptor(),
+  //   new VerificationRequirementsInterceptor(app.get(Reflector)),
+  // );
   
   // Swagger API documentation
   const swaggerConfig = new DocumentBuilder()

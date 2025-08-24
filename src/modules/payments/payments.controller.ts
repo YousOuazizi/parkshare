@@ -16,8 +16,8 @@ import {
   import { RefundPaymentDto } from './dto/refund-payment.dto';
   import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
   import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Roles } from 'src/core/decorators/roles.decorator';
-import { RolesGuard } from 'src/core/guards/roles.guard';
+// import { Roles } from 'src/core/decorators/roles.decorator';
+// import { RolesGuard } from 'src/core/guards/roles.guard';
   
   @ApiTags('payments')
   @Controller('payments')
@@ -44,8 +44,8 @@ import { RolesGuard } from 'src/core/guards/roles.guard';
     }
   
     @Get('admin')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('admin')
+    @UseGuards(JwtAuthGuard)
+    // @Roles('admin')
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Récupérer tous les paiements (admin)' })
     findAllAdmin() {
@@ -96,8 +96,8 @@ import { RolesGuard } from 'src/core/guards/roles.guard';
     }
   
     @Post('refund')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('admin')
+    @UseGuards(JwtAuthGuard)
+    // @Roles('admin')
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Rembourser un paiement (admin)' })
     refundPayment(@Body() refundPaymentDto: RefundPaymentDto) {

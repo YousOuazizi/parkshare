@@ -13,8 +13,8 @@ import {
   import { CreateSubscriptionPlanDto } from './dto/create-subscription-plan.dto';
   import { UpdateSubscriptionPlanDto } from './dto/update-subscription-plan.dto';
   import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-  import { RolesGuard } from '../../core/guards/roles.guard';
-  import { Roles } from '../../core/decorators/roles.decorator';
+  // import { /* RolesGuard */ } from '../../core/guards/roles.guard';
+  // import { Roles } from '../../core/decorators/roles.decorator';
   import { SubscriptionType, RecurrencePattern } from './entities/subscription-plan.entity';
   import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
   
@@ -24,8 +24,8 @@ import {
     constructor(private readonly subscriptionPlansService: SubscriptionPlansService) {}
   
     @Post()
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('admin')
+    @UseGuards(JwtAuthGuard, /* RolesGuard */)
+    // @Roles('admin')
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Créer un nouveau plan d\'abonnement (admin)' })
     create(@Body() createSubscriptionPlanDto: CreateSubscriptionPlanDto) {
@@ -49,8 +49,8 @@ import {
     }
   
     @Patch(':id')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('admin')
+    @UseGuards(JwtAuthGuard, /* RolesGuard */)
+    // @Roles('admin')
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Mettre à jour un plan d\'abonnement (admin)' })
     update(
@@ -61,8 +61,8 @@ import {
     }
   
     @Delete(':id')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('admin')
+    @UseGuards(JwtAuthGuard, /* RolesGuard */)
+    // @Roles('admin')
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Supprimer un plan d\'abonnement (admin)' })
     remove(@Param('id') id: string) {

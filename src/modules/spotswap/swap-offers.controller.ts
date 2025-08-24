@@ -11,7 +11,7 @@ import {
     ForbiddenException
   } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
-import { RequestWithUser } from 'src/core/interfaces/request-with-user.interface';
+// import { any } from 'src/core/interfaces/request-with-user.interface';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { VerificationLevel } from '../users/entities/user.entity';
 import { RequiredVerificationLevel } from '../verification/decorators/required-verification-level.decorator';
@@ -32,7 +32,7 @@ import { SpotSwapService } from './spotswap.service';
     @RequiredVerificationLevel(VerificationLevel.LEVEL_2)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Créer une nouvelle offre d\'échange' })
-    create(@Request() req: RequestWithUser, @Body() createOfferDto: CreateSwapOfferDto) {
+    create(@Request() req: any, @Body() createOfferDto: CreateSwapOfferDto) {
       if (!req.user) {
         throw new ForbiddenException('Utilisateur non authentifié');
       }
@@ -44,7 +44,7 @@ import { SpotSwapService } from './spotswap.service';
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Récupérer mes offres d\'échange' })
     @ApiQuery({ name: 'status', enum: SwapOfferStatus, required: false })
-    findAll(@Request() req: RequestWithUser, @Query('status') status?: SwapOfferStatus) {
+    findAll(@Request() req: any, @Query('status') status?: SwapOfferStatus) {
       if (!req.user) {
         throw new ForbiddenException('Utilisateur non authentifié');
       }
@@ -65,7 +65,7 @@ import { SpotSwapService } from './spotswap.service';
     @ApiOperation({ summary: 'Mettre à jour une offre d\'échange' })
     update(
       @Param('id') id: string, 
-      @Request() req: RequestWithUser, 
+      @Request() req: any, 
       @Body() updateOfferDto: UpdateSwapOfferDto
     ) {
       if (!req.user) {
@@ -78,7 +78,7 @@ import { SpotSwapService } from './spotswap.service';
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Annuler une offre d\'échange' })
-    cancel(@Param('id') id: string, @Request() req: RequestWithUser) {
+    cancel(@Param('id') id: string, @Request() req: any) {
       if (!req.user) {
         throw new ForbiddenException('Utilisateur non authentifié');
       }
@@ -91,7 +91,7 @@ import { SpotSwapService } from './spotswap.service';
     @ApiOperation({ summary: 'Répondre à une offre d\'échange (accepter/refuser)' })
     respond(
       @Param('id') id: string, 
-      @Request() req: RequestWithUser, 
+      @Request() req: any, 
       @Body() responseDto: RespondToOfferDto
     ) {
       if (!req.user) {
@@ -104,7 +104,7 @@ import { SpotSwapService } from './spotswap.service';
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Marquer un échange comme terminé' })
-    complete(@Param('id') id: string, @Request() req: RequestWithUser) {
+    complete(@Param('id') id: string, @Request() req: any) {
       if (!req.user) {
         throw new ForbiddenException('Utilisateur non authentifié');
       }

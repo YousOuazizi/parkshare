@@ -12,9 +12,9 @@ import { AnalyticsService } from './analytics.service';
 import { CreateAnalyticsEventDto } from './dto/create-analytics-event.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Roles } from 'src/core/decorators/roles.decorator';
-import { RolesGuard } from 'src/core/guards/roles.guard';
-import { RequestWithUser } from 'src/core/interfaces/request-with-user.interface';
+// import { Roles } from 'src/core/decorators/roles.decorator';
+// import { RolesGuard } from 'src/core/guards/roles.guard';
+// import { RequestWithUser } from 'src/core/interfaces/request-with-user.interface';
 import { ParkingsService } from '../parkings/services/parkings.service';
 
 @ApiTags('analytics')
@@ -29,7 +29,7 @@ export class AnalyticsController {
   @ApiOperation({ summary: "Suivre un événement d'analyse" })
   trackEvent(
     @Body() createAnalyticsEventDto: CreateAnalyticsEventDto,
-    @Req() request: RequestWithUser,
+    @Req() request: any,
   ) {
     return this.analyticsService.trackEvent(
       createAnalyticsEventDto,
@@ -39,8 +39,8 @@ export class AnalyticsController {
   }
 
   @Get('dashboard')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @UseGuards(JwtAuthGuard)
+  // @Roles('admin')
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Obtenir les statistiques du tableau de bord admin',
@@ -55,7 +55,7 @@ export class AnalyticsController {
   @ApiOperation({
     summary: "Obtenir les statistiques de l'utilisateur connecté",
   })
-  getUserStats(@Req() req: RequestWithUser) {
+  getUserStats(@Req() req: any) {
     if (!req.user) {
       throw new ForbiddenException('Utilisateur non authentifié');
     }
@@ -66,7 +66,7 @@ export class AnalyticsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: "Obtenir les statistiques d'un parking" })
-  async getParkingStats(@Param('parkingId') parkingId: string, @Req() req: RequestWithUser) {
+  async getParkingStats(@Param('parkingId') parkingId: string, @Req() req: any) {
     if (!req.user) {
       throw new ForbiddenException('Utilisateur non authentifié');
     }

@@ -16,9 +16,9 @@ import {
   import { PauseSubscriptionDto } from './dto/pause-subscription.dto';
   import { ShareSubscriptionDto } from './dto/share-subscription.dto';
   import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-  import { RolesGuard } from '../../core/guards/roles.guard';
-  import { Roles } from '../../core/decorators/roles.decorator';
-  import { RequestWithUser } from '../../core/interfaces/request-with-user.interface';
+  // import { /* RolesGuard */ } from '../../core/guards/roles.guard';
+  // import { Roles } from '../../core/decorators/roles.decorator';
+  // import { any } from '../../core/interfaces/request-with-user.interface';
   import { SubscriptionStatus } from './entities/subscription.entity';
   import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
   import { VerificationLevel } from '../../modules/users/entities/user.entity';
@@ -35,7 +35,7 @@ import { CreateSubscriptionDto } from './dto/create-subscription.dto';
     @RequiredVerificationLevel(VerificationLevel.LEVEL_2)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Créer un nouvel abonnement' })
-    create(@Request() req: RequestWithUser, @Body() createSubscriptionDto: CreateSubscriptionDto) {
+    create(@Request() req: any, @Body() createSubscriptionDto: CreateSubscriptionDto) {
       if (!req.user) {
         throw new ForbiddenException('Utilisateur non authentifié');
       }
@@ -50,7 +50,7 @@ import { CreateSubscriptionDto } from './dto/create-subscription.dto';
     @ApiQuery({ name: 'parkingId', required: false })
     @ApiQuery({ name: 'status', enum: SubscriptionStatus, required: false })
     findAll(
-      @Request() req: RequestWithUser, 
+      @Request() req: any, 
       @Query('userId') userId?: string,
       @Query('parkingId') parkingId?: string,
       @Query('status') status?: SubscriptionStatus
@@ -74,7 +74,7 @@ import { CreateSubscriptionDto } from './dto/create-subscription.dto';
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Récupérer un abonnement par son ID' })
-    async findOne(@Param('id') id: string, @Request() req: RequestWithUser) {
+    async findOne(@Param('id') id: string, @Request() req: any) {
       if (!req.user) {
         throw new ForbiddenException('Utilisateur non authentifié');
       }
@@ -103,7 +103,7 @@ import { CreateSubscriptionDto } from './dto/create-subscription.dto';
     @ApiOperation({ summary: 'Mettre à jour un abonnement' })
     update(
       @Param('id') id: string, 
-      @Request() req: RequestWithUser, 
+      @Request() req: any, 
       @Body() updateSubscriptionDto: UpdateSubscriptionDto
     ) {
       if (!req.user) {
@@ -118,7 +118,7 @@ import { CreateSubscriptionDto } from './dto/create-subscription.dto';
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Annuler un abonnement' })
-    cancel(@Param('id') id: string, @Request() req: RequestWithUser) {
+    cancel(@Param('id') id: string, @Request() req: any) {
       if (!req.user) {
         throw new ForbiddenException('Utilisateur non authentifié');
       }
@@ -133,7 +133,7 @@ import { CreateSubscriptionDto } from './dto/create-subscription.dto';
     @ApiOperation({ summary: 'Mettre en pause un abonnement' })
     pauseSubscription(
       @Param('id') id: string, 
-      @Request() req: RequestWithUser, 
+      @Request() req: any, 
       @Body() pauseSubscriptionDto: PauseSubscriptionDto
     ) {
       if (!req.user) {
@@ -148,7 +148,7 @@ import { CreateSubscriptionDto } from './dto/create-subscription.dto';
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Reprendre un abonnement en pause' })
-    resumeSubscription(@Param('id') id: string, @Request() req: RequestWithUser) {
+    resumeSubscription(@Param('id') id: string, @Request() req: any) {
       if (!req.user) {
         throw new ForbiddenException('Utilisateur non authentifié');
       }
@@ -163,7 +163,7 @@ import { CreateSubscriptionDto } from './dto/create-subscription.dto';
     @ApiOperation({ summary: 'Partager un abonnement avec un autre utilisateur' })
     shareSubscription(
       @Param('id') id: string, 
-      @Request() req: RequestWithUser, 
+      @Request() req: any, 
       @Body() shareSubscriptionDto: ShareSubscriptionDto
     ) {
       if (!req.user) {
@@ -177,7 +177,7 @@ import { CreateSubscriptionDto } from './dto/create-subscription.dto';
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Accepter un partage d\'abonnement' })
-    acceptSharing(@Param('id') id: string, @Request() req: RequestWithUser) {
+    acceptSharing(@Param('id') id: string, @Request() req: any) {
       if (!req.user) {
         throw new ForbiddenException('Utilisateur non authentifié');
       }
@@ -189,7 +189,7 @@ import { CreateSubscriptionDto } from './dto/create-subscription.dto';
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Refuser un partage d\'abonnement' })
-    rejectSharing(@Param('id') id: string, @Request() req: RequestWithUser) {
+    rejectSharing(@Param('id') id: string, @Request() req: any) {
       if (!req.user) {
         throw new ForbiddenException('Utilisateur non authentifié');
       }
@@ -201,7 +201,7 @@ import { CreateSubscriptionDto } from './dto/create-subscription.dto';
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Révoquer un partage d\'abonnement' })
-    revokeSharing(@Param('id') id: string, @Request() req: RequestWithUser) {
+    revokeSharing(@Param('id') id: string, @Request() req: any) {
       if (!req.user) {
         throw new ForbiddenException('Utilisateur non authentifié');
       }
@@ -213,7 +213,7 @@ import { CreateSubscriptionDto } from './dto/create-subscription.dto';
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Obtenir le rapport d\'utilisation d\'un abonnement' })
-    getUsageReport(@Param('id') id: string, @Request() req: RequestWithUser) {
+    getUsageReport(@Param('id') id: string, @Request() req: any) {
       if (!req.user) {
         throw new ForbiddenException('Utilisateur non authentifié');
       }
@@ -225,7 +225,7 @@ import { CreateSubscriptionDto } from './dto/create-subscription.dto';
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Vérifier si l\'utilisateur a accès à un parking via un abonnement' })
-    checkAccess(@Param('parkingId') parkingId: string, @Request() req: RequestWithUser) {
+    checkAccess(@Param('parkingId') parkingId: string, @Request() req: any) {
       if (!req.user) {
         throw new ForbiddenException('Utilisateur non authentifié');
       }

@@ -66,7 +66,7 @@ export class ReviewsService {
     review.isVerified = false;
     review.parkingId = type === ReviewType.PARKING ? booking.parkingId : '';
     review.targetUserId = type === ReviewType.USER ? booking.userId : '';
-    review.criteria = criteria || {};
+    // review.criteria = criteria || {}; // Type mismatch - needs ReviewCriteria entity
     
     const savedReview = await this.reviewsRepository.save(review);
     

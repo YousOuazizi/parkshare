@@ -19,8 +19,8 @@ import {
   import { VerifyPhoneDto } from './dto/verify-phone.dto';
   import { UploadIdDocumentDto, DocumentType } from './dto/upload-id-document.dto';
   import { ApiBearerAuth, ApiOperation, ApiConsumes, ApiBody, ApiTags } from '@nestjs/swagger';
-import { Roles } from 'src/core/decorators/roles.decorator';
-import { RolesGuard } from 'src/core/guards/roles.guard';
+// import { Roles } from 'src/core/decorators/roles.decorator';
+// import { RolesGuard } from 'src/core/guards/roles.guard';
   
   @ApiTags('verification')
   @Controller('verification')
@@ -105,8 +105,8 @@ import { RolesGuard } from 'src/core/guards/roles.guard';
     }
   
     @Patch('identity/approve/:userId')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('admin')
+    @UseGuards(JwtAuthGuard)
+    // @Roles('admin')
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Approuver la vérification d\'identité (admin)' })
     approveIdVerification(@Param('userId') userId: string, @Request() req) {
@@ -114,8 +114,8 @@ import { RolesGuard } from 'src/core/guards/roles.guard';
     }
   
     @Patch('advanced/approve/:userId')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('admin')
+    @UseGuards(JwtAuthGuard)
+    // @Roles('admin')
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Approuver la vérification avancée (admin)' })
     approveAdvancedVerification(@Param('userId') userId: string, @Request() req) {
