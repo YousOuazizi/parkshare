@@ -10,7 +10,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install all dependencies (including devDependencies for build)
-RUN npm ci --prefer-offline --no-audit
+RUN npm ci --prefer-offline --no-audit --legacy-peer-deps
 
 # Copy source code
 COPY . .
