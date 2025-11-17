@@ -6,28 +6,22 @@ import { VerificationLevel } from '../../core/models';
 export const PARKING_ROUTES: Routes = [
   {
     path: '',
-    loadComponent: () => import('./pages/parking-list/parking-list.component').then(m => m.ParkingListComponent)
-  },
-  {
-    path: 'my-parkings',
-    canActivate: [authGuard, verificationLevelGuard],
-    data: { verificationLevel: VerificationLevel.LEVEL_3 },
-    loadComponent: () => import('./pages/my-parkings/my-parkings.component').then(m => m.MyParkingsComponent)
+    loadComponent: () => import('./components/parking-list/parking-list.component').then(m => m.ParkingListComponent)
   },
   {
     path: 'create',
     canActivate: [authGuard, verificationLevelGuard],
     data: { verificationLevel: VerificationLevel.LEVEL_3 },
-    loadComponent: () => import('./pages/parking-create/parking-create.component').then(m => m.ParkingCreateComponent)
+    loadComponent: () => import('./components/parking-form/parking-form.component').then(m => m.ParkingFormComponent)
   },
   {
     path: ':id',
-    loadComponent: () => import('./pages/parking-detail/parking-detail.component').then(m => m.ParkingDetailComponent)
+    loadComponent: () => import('./components/parking-detail/parking-detail.component').then(m => m.ParkingDetailComponent)
   },
   {
     path: ':id/edit',
     canActivate: [authGuard, verificationLevelGuard],
     data: { verificationLevel: VerificationLevel.LEVEL_3 },
-    loadComponent: () => import('./pages/parking-create/parking-create.component').then(m => m.ParkingCreateComponent)
+    loadComponent: () => import('./components/parking-form/parking-form.component').then(m => m.ParkingFormComponent)
   }
 ];

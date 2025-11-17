@@ -8,8 +8,12 @@ export const routes: Routes = [
   // Public routes
   {
     path: '',
-    redirectTo: '/parkings',
+    redirectTo: '/home',
     pathMatch: 'full'
+  },
+  {
+    path: 'home',
+    loadComponent: () => import('./features/home/home.component').then(m => m.HomeComponent)
   },
 
   // Authentication routes (public)

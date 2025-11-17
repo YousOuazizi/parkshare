@@ -1,13 +1,15 @@
 import { Routes } from '@angular/router';
+import { authGuard } from '../../core/guards/auth.guard';
 
 export const SUBSCRIPTION_ROUTES: Routes = [
   {
     path: 'plans',
-    loadComponent: () => import('./pages/subscription-plans/subscription-plans.component').then(m => m.SubscriptionPlansComponent)
+    loadComponent: () => import('./components/subscription-plans/subscription-plans.component').then(m => m.SubscriptionPlansComponent)
   },
   {
     path: 'my-subscriptions',
-    loadComponent: () => import('./pages/my-subscriptions/my-subscriptions.component').then(m => m.MySubscriptionsComponent)
+    canActivate: [authGuard],
+    loadComponent: () => import('./components/my-subscriptions/my-subscriptions.component').then(m => m.MySubscriptionsComponent)
   },
   {
     path: '',

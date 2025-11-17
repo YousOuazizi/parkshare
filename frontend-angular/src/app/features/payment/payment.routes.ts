@@ -1,12 +1,10 @@
 import { Routes } from '@angular/router';
+import { authGuard } from '../../core/guards/auth.guard';
 
 export const PAYMENT_ROUTES: Routes = [
   {
     path: '',
-    loadComponent: () => import('./pages/payment-list/payment-list.component').then(m => m.PaymentListComponent)
-  },
-  {
-    path: ':id',
-    loadComponent: () => import('./pages/payment-detail/payment-detail.component').then(m => m.PaymentDetailComponent)
+    canActivate: [authGuard],
+    loadComponent: () => import('./components/payment-list/payment-list.component').then(m => m.PaymentListComponent)
   }
 ];

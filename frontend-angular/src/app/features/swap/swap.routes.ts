@@ -1,17 +1,20 @@
 import { Routes } from '@angular/router';
+import { authGuard } from '../../core/guards/auth.guard';
 
 export const SWAP_ROUTES: Routes = [
   {
     path: 'listings',
-    loadComponent: () => import('./pages/swap-listings/swap-listings.component').then(m => m.SwapListingsComponent)
+    loadComponent: () => import('./components/swap-listings/swap-listings.component').then(m => m.SwapListingsComponent)
   },
   {
-    path: 'my-listings',
-    loadComponent: () => import('./pages/my-swap-listings/my-swap-listings.component').then(m => m.MySwapListingsComponent)
+    path: 'create',
+    canActivate: [authGuard],
+    loadComponent: () => import('./components/swap-create/swap-create.component').then(m => m.SwapCreateComponent)
   },
   {
     path: 'offers',
-    loadComponent: () => import('./pages/swap-offers/swap-offers.component').then(m => m.SwapOffersComponent)
+    canActivate: [authGuard],
+    loadComponent: () => import('./components/swap-offers/swap-offers.component').then(m => m.SwapOffersComponent)
   },
   {
     path: '',

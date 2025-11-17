@@ -1,13 +1,15 @@
 import { Routes } from '@angular/router';
+import { authGuard } from '../../core/guards/auth.guard';
 
 export const PRICING_ROUTES: Routes = [
   {
     path: 'dashboard/:parkingId',
-    loadComponent: () => import('./pages/pricing-dashboard/pricing-dashboard.component').then(m => m.PricingDashboardComponent)
+    canActivate: [authGuard],
+    loadComponent: () => import('./components/pricing-dashboard/pricing-dashboard.component').then(m => m.PricingDashboardComponent)
   },
   {
     path: '',
-    redirectTo: '/parkings/my-parkings',
+    redirectTo: '/parkings',
     pathMatch: 'full'
   }
 ];

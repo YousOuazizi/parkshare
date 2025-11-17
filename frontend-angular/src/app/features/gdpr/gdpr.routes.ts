@@ -1,17 +1,21 @@
 import { Routes } from '@angular/router';
+import { authGuard } from '../../core/guards/auth.guard';
 
 export const GDPR_ROUTES: Routes = [
   {
     path: 'consent',
-    loadComponent: () => import('./pages/consent-management/consent-management.component').then(m => m.ConsentManagementComponent)
+    canActivate: [authGuard],
+    loadComponent: () => import('./components/gdpr-consent/gdpr-consent.component').then(m => m.GdprConsentComponent)
   },
   {
-    path: 'data-export',
-    loadComponent: () => import('./pages/data-export/data-export.component').then(m => m.DataExportComponent)
+    path: 'export',
+    canActivate: [authGuard],
+    loadComponent: () => import('./components/gdpr-export/gdpr-export.component').then(m => m.GdprExportComponent)
   },
   {
-    path: 'data-deletion',
-    loadComponent: () => import('./pages/data-deletion/data-deletion.component').then(m => m.DataDeletionComponent)
+    path: 'delete',
+    canActivate: [authGuard],
+    loadComponent: () => import('./components/gdpr-delete/gdpr-delete.component').then(m => m.GdprDeleteComponent)
   },
   {
     path: '',
