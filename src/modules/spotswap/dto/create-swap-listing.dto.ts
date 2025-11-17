@@ -1,13 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { 
-  IsNotEmpty, 
-  IsString, 
-  IsNumber, 
-  IsBoolean, 
-  IsOptional, 
+import {
+  IsNotEmpty,
+  IsString,
+  IsNumber,
+  IsBoolean,
+  IsOptional,
   IsDateString,
   Min,
-  Max
+  Max,
 } from 'class-validator';
 
 export class CreateSwapListingDto {
@@ -16,7 +16,10 @@ export class CreateSwapListingDto {
   @IsNotEmpty()
   parkingId: string;
 
-  @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000', required: false })
+  @ApiProperty({
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    required: false,
+  })
   @IsString()
   @IsOptional()
   subscriptionId?: string;
@@ -31,7 +34,9 @@ export class CreateSwapListingDto {
   @IsNotEmpty()
   endDate: string;
 
-  @ApiProperty({ example: 'Je pars en vacances et ma place est disponible pendant 3 jours.' })
+  @ApiProperty({
+    example: 'Je pars en vacances et ma place est disponible pendant 3 jours.',
+  })
   @IsString()
   @IsNotEmpty()
   description: string;

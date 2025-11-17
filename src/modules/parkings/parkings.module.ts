@@ -17,14 +17,14 @@ import { UsersModule } from '../users/users.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      Parking, 
+      Parking,
       PriceRule,
       ParkingSize,
       ParkingFeature,
       ParkingPhoto,
       AvailabilitySchedule,
       AvailabilityTimeSlot,
-      AvailabilityException
+      AvailabilityException,
     ]),
     UsersModule,
   ],

@@ -1,17 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { 
-  IsNotEmpty, 
-  IsString, 
-  IsNumber, 
-  IsOptional, 
-  IsEnum, 
-  IsBoolean, 
-  IsArray, 
+import {
+  IsNotEmpty,
+  IsString,
+  IsNumber,
+  IsOptional,
+  IsEnum,
+  IsBoolean,
+  IsArray,
   ValidateNested,
   Min,
   Max,
   IsLatitude,
-  IsLongitude
+  IsLongitude,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { AccessMethod } from '../entities/parking.entity';
@@ -160,7 +160,7 @@ export class CreateParkingDto {
   @IsString()
   currency?: string;
 
-  @ApiProperty({ enum: AccessMethod, description: 'Méthode d\'accès' })
+  @ApiProperty({ enum: AccessMethod, description: "Méthode d'accès" })
   @IsEnum(AccessMethod)
   accessMethod: AccessMethod;
 
@@ -180,13 +180,21 @@ export class CreateParkingDto {
   @Type(() => ParkingSizeDto)
   size?: ParkingSizeDto;
 
-  @ApiProperty({ type: [String], required: false, description: 'Caractéristiques du parking' })
+  @ApiProperty({
+    type: [String],
+    required: false,
+    description: 'Caractéristiques du parking',
+  })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
   features?: string[];
 
-  @ApiProperty({ type: [String], required: false, description: 'URLs des photos' })
+  @ApiProperty({
+    type: [String],
+    required: false,
+    description: 'URLs des photos',
+  })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })

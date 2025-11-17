@@ -9,10 +9,7 @@ import { MLPricingAlgorithm } from './algorithms/ml-pricing.algorithm';
 import { ParkingsModule } from '../parkings/parkings.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([PriceSuggestion]),
-    ParkingsModule,
-  ],
+  imports: [TypeOrmModule.forFeature([PriceSuggestion]), ParkingsModule],
   controllers: [PricingController],
   providers: [
     PricingService,

@@ -14,7 +14,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
     if (!refreshSecret) {
       throw new Error('JWT refresh secret is not defined in configuration');
     }
-    
+
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: refreshSecret,
@@ -27,17 +27,17 @@ export class JwtRefreshStrategy extends PassportStrategy(
     if (!authHeader) {
       throw new UnauthorizedException('Authorization header is missing');
     }
-    
+
     const refreshToken = authHeader.split(' ')[1];
     if (!refreshToken) {
       throw new UnauthorizedException('Refresh token is malformed');
     }
-    
-    return { 
-      id: payload.sub, 
-      email: payload.email, 
-      role: payload.role, 
-      refreshToken 
+
+    return {
+      id: payload.sub,
+      email: payload.email,
+      role: payload.role,
+      refreshToken,
     };
   }
 }

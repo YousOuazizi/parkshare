@@ -51,7 +51,7 @@ export class AnalyticsEvent {
   @Column({ nullable: true })
   resourceType: string;
 
-  @OneToOne(() => AnalyticsEventData, eventData => eventData.event, {
+  @OneToOne(() => AnalyticsEventData, (eventData) => eventData.event, {
     cascade: true,
     eager: true,
   })

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Notification, NotificationType } from './entities/notification.entity';
@@ -14,16 +18,21 @@ export class NotificationsService {
     private eventsGateway: EventsGateway,
   ) {}
 
-  async create(createNotificationDto: CreateNotificationDto): Promise<Notification> {
-    const notification = this.notificationsRepository.create(createNotificationDto);
-    const savedNotification = await this.notificationsRepository.save(notification);
-    
+  async create(
+    createNotificationDto: CreateNotificationDto,
+  ): Promise<Notification> {
+    const notification = this.notificationsRepository.create(
+      createNotificationDto,
+    );
+    const savedNotification =
+      await this.notificationsRepository.save(notification);
+
     // Envoyer la notification en temps réel via WebSockets
     this.eventsGateway.sendNotificationToUser(
       savedNotification.userId,
-      savedNotification
+      savedNotification,
     );
-    
+
     return savedNotification;
   }
 
@@ -38,23 +47,32 @@ export class NotificationsService {
     const notification = await this.notificationsRepository.findOne({
       where: { id },
     });
-    
+
     if (!notification) {
       throw new NotFoundException(`Notification avec l'id ${id} non trouvée`);
     }
-    
+
     return notification;
   }
 
-  async update(id: string, userId: string, updateNotificationDto: UpdateNotificationDto): Promise<Notification> {
+  async update(
+    id: string,
+    userId: string,
+    updateNotificationDto: UpdateNotificationDto,
+  ): Promise<Notification> {
     const notification = await this.findOne(id);
-    
+
     // Vérifier si l'utilisateur est le destinataire de la notification
     if (notification.userId !== userId) {
-      throw new ForbiddenException('Vous n\'êtes pas autorisé à modifier cette notification');
+      throw new ForbiddenException(
+        "Vous n'êtes pas autorisé à modifier cette notification",
+      );
     }
-    
-    const updatedNotification = Object.assign(notification, updateNotificationDto);
+
+    const updatedNotification = Object.assign(
+      notification,
+      updateNotificationDto,
+    );
     return this.notificationsRepository.save(updatedNotification);
   }
 
@@ -65,18 +83,20 @@ export class NotificationsService {
   async markAllAsRead(userId: string): Promise<void> {
     await this.notificationsRepository.update(
       { userId, read: false },
-      { read: true }
+      { read: true },
     );
   }
 
   async remove(id: string, userId: string): Promise<void> {
     const notification = await this.findOne(id);
-    
+
     // Vérifier si l'utilisateur est le destinataire de la notification
     if (notification.userId !== userId) {
-      throw new ForbiddenException('Vous n\'êtes pas autorisé à supprimer cette notification');
+      throw new ForbiddenException(
+        "Vous n'êtes pas autorisé à supprimer cette notification",
+      );
     }
-    
+
     await this.notificationsRepository.remove(notification);
   }
 
@@ -91,11 +111,11 @@ export class NotificationsService {
     userId: string,
     type: NotificationType,
     bookingId: string,
-    bookingDetails: any
+    bookingDetails: any,
   ): Promise<Notification> {
     let title = '';
     let content = '';
-    
+
     switch (type) {
       case NotificationType.BOOKING_CREATED:
         title = 'Nouvelle réservation';
@@ -121,7 +141,7 @@ export class NotificationsService {
         title = 'Notification de réservation';
         content = `Mise à jour concernant votre réservation. ID de réservation: ${bookingId}.`;
     }
-    
+
     return this.create({
       userId,
       type,

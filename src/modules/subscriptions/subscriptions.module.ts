@@ -19,15 +19,15 @@ import { SubscriptionsController } from './subscriptions.controller';
       Subscription,
       SubscriptionPlan,
       SubscriptionPause,
-      SubscriptionSharing
+      SubscriptionSharing,
     ]),
     ParkingsModule,
     UsersModule,
     NotificationsModule,
-    PaymentsModule
+    PaymentsModule,
   ],
   controllers: [SubscriptionsController, SubscriptionPlansController],
   providers: [SubscriptionsService, SubscriptionPlansService],
-  exports: [SubscriptionsService, SubscriptionPlansService]
+  exports: [SubscriptionsService, SubscriptionPlansService],
 })
 export class SubscriptionsModule {}

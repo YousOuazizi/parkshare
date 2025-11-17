@@ -1,13 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { 
-  IsOptional, 
-  IsNumber, 
-  IsString, 
-  IsBoolean, 
-  IsDateString, 
-  IsArray, 
-  Min, 
-  Max
+import {
+  IsOptional,
+  IsNumber,
+  IsString,
+  IsBoolean,
+  IsDateString,
+  IsArray,
+  Min,
+  Max,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -28,7 +28,11 @@ export class SearchParkingDto {
   @Max(180)
   longitude?: number;
 
-  @ApiProperty({ required: false, example: 1000, description: 'Rayon de recherche en mètres' })
+  @ApiProperty({
+    required: false,
+    example: 1000,
+    description: 'Rayon de recherche en mètres',
+  })
   @IsOptional()
   @IsNumber()
   @Type(() => Number)
@@ -50,7 +54,11 @@ export class SearchParkingDto {
   @IsString()
   location?: string;
 
-  @ApiProperty({ required: false, example: 10.0, description: 'Prix maximum par heure' })
+  @ApiProperty({
+    required: false,
+    example: 10.0,
+    description: 'Prix maximum par heure',
+  })
   @IsOptional()
   @IsNumber()
   @Type(() => Number)

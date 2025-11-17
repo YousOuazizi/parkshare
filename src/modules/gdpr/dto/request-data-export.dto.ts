@@ -5,7 +5,7 @@ export class RequestDataExportDto {
   @ApiProperty({
     enum: ['JSON', 'CSV'],
     default: 'JSON',
-    description: 'Format de l\'export',
+    description: "Format de l'export",
   })
   @IsOptional()
   @IsEnum(['JSON', 'CSV'])

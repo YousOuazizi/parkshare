@@ -18,22 +18,29 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
-    
+
     if (user && (await bcrypt.compare(password, user.password))) {
       const { password, refreshToken, ...result } = user;
       return result;
     }
-    
+
     return null;
   }
 
   async login(user: any) {
-    const tokens = await this.getTokens(user.id, user.email, user.role, user.verificationLevel);
+    const tokens = await this.getTokens(
+      user.id,
+      user.email,
+      user.role,
+      user.verificationLevel,
+    );
     await this.usersService.setRefreshToken(user.id, tokens.refreshToken);
-    
+
     // Récupérer les informations de vérification pour les inclure dans la réponse
-    const verificationInfo = await this.verificationService.getVerificationInfo(user.id);
-    
+    const verificationInfo = await this.verificationService.getVerificationInfo(
+      user.id,
+    );
+
     return {
       user: {
         id: user.id,
@@ -61,13 +68,17 @@ export class AuthService {
   async register(registerDto: RegisterDto) {
     const user = await this.usersService.create(registerDto);
 
-    
-    const tokens = await this.getTokens(user.id, user.email, user.role, user.verificationLevel);
+    const tokens = await this.getTokens(
+      user.id,
+      user.email,
+      user.role,
+      user.verificationLevel,
+    );
     await this.usersService.setRefreshToken(user.id, tokens.refreshToken);
-    
+
     // Envoyer automatiquement un email de vérification
     await this.verificationService.sendEmailVerification(user.id);
-    
+
     return {
       user: {
         id: user.id,
@@ -78,7 +89,9 @@ export class AuthService {
         verificationLevel: user.verificationLevel,
       },
       verification: {
-        nextSteps: ['Vérifiez votre adresse email pour débloquer plus de fonctionnalités'],
+        nextSteps: [
+          'Vérifiez votre adresse email pour débloquer plus de fonctionnalités',
+        ],
         levelRequirements: await this.getLevelRequirements(),
       },
       ...tokens,
@@ -87,23 +100,28 @@ export class AuthService {
 
   async refreshTokens(userId: string, refreshToken: string) {
     const user = await this.usersService.findOne(userId);
-    
+
     if (!user || !user.refreshToken) {
       throw new UnauthorizedException('Accès refusé');
     }
-    
+
     const refreshTokenMatches = await bcrypt.compare(
       refreshToken,
       user.refreshToken,
     );
-    
+
     if (!refreshTokenMatches) {
       throw new UnauthorizedException('Accès refusé');
     }
-    
-    const tokens = await this.getTokens(user.id, user.email, user.role, user.verificationLevel);
+
+    const tokens = await this.getTokens(
+      user.id,
+      user.email,
+      user.role,
+      user.verificationLevel,
+    );
     await this.usersService.setRefreshToken(user.id, tokens.refreshToken);
-    
+
     return tokens;
   }
 
@@ -112,7 +130,12 @@ export class AuthService {
     return { message: 'Déconnexion réussie' };
   }
 
-  async getTokens(userId: string, email: string, role: string, verificationLevel: number) {
+  async getTokens(
+    userId: string,
+    email: string,
+    role: string,
+    verificationLevel: number,
+  ) {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
@@ -145,52 +168,52 @@ export class AuthService {
       refreshToken,
     };
   }
-  
+
   // Méthode utilitaire pour obtenir les exigences de chaque niveau
   private async getLevelRequirements() {
     return [
       {
         level: VerificationLevel.LEVEL_1,
-        name: "Email vérifié",
+        name: 'Email vérifié',
         features: [
-          "Navigation de base",
-          "Recherche de parkings",
-          "Consultation des détails",
+          'Navigation de base',
+          'Recherche de parkings',
+          'Consultation des détails',
         ],
-        unlocks: "Accès basique à l'application"
+        unlocks: "Accès basique à l'application",
       },
       {
         level: VerificationLevel.LEVEL_2,
-        name: "Téléphone vérifié",
+        name: 'Téléphone vérifié',
         features: [
-          "Réservation de parkings",
+          'Réservation de parkings',
           "Paiements jusqu'à 200€",
-          "Maximum 2 réservations actives",
+          'Maximum 2 réservations actives',
         ],
-        unlocks: "Réservation avec limites"
+        unlocks: 'Réservation avec limites',
       },
       {
         level: VerificationLevel.LEVEL_3,
-        name: "Identité vérifiée",
+        name: 'Identité vérifiée',
         features: [
-          "Publication de parkings",
+          'Publication de parkings',
           "Paiements jusqu'à 1000€",
-          "Maximum 5 réservations actives",
-          "Maximum 3 parkings publiés"
+          'Maximum 5 réservations actives',
+          'Maximum 3 parkings publiés',
         ],
-        unlocks: "Publication et paiements importants"
+        unlocks: 'Publication et paiements importants',
       },
       {
         level: VerificationLevel.LEVEL_4,
-        name: "Vérification avancée",
+        name: 'Vérification avancée',
         features: [
-          "Paiements sans limite",
-          "Réservations illimitées",
-          "Parkings illimités",
-          "Accès aux fonctionnalités premium"
+          'Paiements sans limite',
+          'Réservations illimitées',
+          'Parkings illimités',
+          'Accès aux fonctionnalités premium',
         ],
-        unlocks: "Accès complet sans restrictions"
-      }
+        unlocks: 'Accès complet sans restrictions',
+      },
     ];
   }
 }

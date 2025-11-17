@@ -11,11 +11,15 @@ import { ThrottlerGuard, ThrottlerException } from '@nestjs/throttler';
  */
 @Injectable()
 export class CustomThrottlerGuard extends ThrottlerGuard {
-  protected async throwThrottlingException(context: ExecutionContext): Promise<void> {
+  protected async throwThrottlingException(
+    context: ExecutionContext,
+  ): Promise<void> {
     const request = context.switchToHttp().getRequest();
 
     // Logger les tentatives d'abus
-    console.warn(`Rate limit exceeded for IP: ${request.ip}, Path: ${request.path}`);
+    console.warn(
+      `Rate limit exceeded for IP: ${request.ip}, Path: ${request.path}`,
+    );
 
     // Lancer une exception personnalisée
     throw new ThrottlerException(

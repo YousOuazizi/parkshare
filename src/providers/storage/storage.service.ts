@@ -11,11 +11,15 @@ export class StorageService {
   private readonly bucketName: string;
 
   constructor(private configService: ConfigService) {
-    const accessKeyId = this.configService.get<string>('AWS_ACCESS_KEY_ID') || 'demo-access-key';
-    const secretAccessKey = this.configService.get<string>('AWS_SECRET_ACCESS_KEY') || 'demo-secret-key';
+    const accessKeyId =
+      this.configService.get<string>('AWS_ACCESS_KEY_ID') || 'demo-access-key';
+    const secretAccessKey =
+      this.configService.get<string>('AWS_SECRET_ACCESS_KEY') ||
+      'demo-secret-key';
     const region = this.configService.get<string>('AWS_REGION') || 'eu-west-3';
-    this.bucketName = this.configService.get<string>('AWS_S3_BUCKET_NAME') || 'demo-bucket';
-    
+    this.bucketName =
+      this.configService.get<string>('AWS_S3_BUCKET_NAME') || 'demo-bucket';
+
     this.s3 = new AWS.S3({
       accessKeyId,
       secretAccessKey,
@@ -26,18 +30,20 @@ export class StorageService {
   async uploadFile(
     file: Buffer,
     mimetype: string,
-    folder = 'uploads'
+    folder = 'uploads',
   ): Promise<UploadResult> {
     const key = `${folder}/${uuidv4()}-${Date.now()}`;
 
     try {
-      const result = await this.s3.upload({
-        Bucket: this.bucketName,
-        Key: key,
-        Body: file,
-        ContentType: mimetype,
-        ACL: 'public-read',
-      }).promise();
+      const result = await this.s3
+        .upload({
+          Bucket: this.bucketName,
+          Key: key,
+          Body: file,
+          ContentType: mimetype,
+          ACL: 'public-read',
+        })
+        .promise();
 
       return {
         url: result.Location,
@@ -53,27 +59,34 @@ export class StorageService {
 
   async downloadFile(key: string): Promise<DownloadResult> {
     try {
-      const result = await this.s3.getObject({
-        Bucket: this.bucketName,
-        Key: key,
-      }).promise();
-  
+      const result = await this.s3
+        .getObject({
+          Bucket: this.bucketName,
+          Key: key,
+        })
+        .promise();
+
       return {
         data: result.Body as Buffer,
         mimetype: result.ContentType || 'application/octet-stream',
       };
     } catch (error) {
-      this.logger.error(`Error downloading file: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error downloading file: ${error.message}`,
+        error.stack,
+      );
       throw new Error(`Failed to download file: ${error.message}`);
     }
   }
 
   async deleteFile(key: string): Promise<void> {
     try {
-      await this.s3.deleteObject({
-        Bucket: this.bucketName,
-        Key: key,
-      }).promise();
+      await this.s3
+        .deleteObject({
+          Bucket: this.bucketName,
+          Key: key,
+        })
+        .promise();
     } catch (error) {
       this.logger.error(`Error deleting file: ${error.message}`, error.stack);
       throw new Error(`Failed to delete file: ${error.message}`);

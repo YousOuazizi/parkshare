@@ -1,12 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { 
-  IsOptional, 
-  IsDateString, 
-  IsString, 
-  IsNumber, 
+import {
+  IsOptional,
+  IsDateString,
+  IsString,
+  IsNumber,
   IsBoolean,
   Min,
-  Max
+  Max,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { SwapListingStatus } from '../entities/swap-listing.entity';

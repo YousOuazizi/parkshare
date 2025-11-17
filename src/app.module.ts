@@ -47,10 +47,10 @@ import { CustomThrottlerGuard } from './core/guards/custom-throttler.guard';
       inject: [ConfigService],
       useFactory: getDatabaseConfig,
     }),
-    
+
     // Infrastructure modules
     ProvidersModule,
-    
+
     // Application modules
     UsersModule,
     AuthModule,
@@ -67,7 +67,6 @@ import { CustomThrottlerGuard } from './core/guards/custom-throttler.guard';
     SpotSwapModule,
     GdprModule,
     HealthModule,
-
   ],
   controllers: [],
   providers: [

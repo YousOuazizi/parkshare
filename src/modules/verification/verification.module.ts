@@ -7,11 +7,7 @@ import { UsersModule } from '../users/users.module';
 import { ProvidersModule } from '../../providers/providers.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([User]),
-    UsersModule,
-    ProvidersModule,
-  ],
+  imports: [TypeOrmModule.forFeature([User]), UsersModule, ProvidersModule],
   controllers: [VerificationController],
   providers: [VerificationService],
   exports: [VerificationService],

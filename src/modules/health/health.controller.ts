@@ -78,7 +78,7 @@ export class HealthController {
 
   @Get('disk')
   @HealthCheck()
-  @ApiOperation({ summary: 'Check de l\'espace disque' })
+  @ApiOperation({ summary: "Check de l'espace disque" })
   checkDisk() {
     return this.health.check([
       () =>

@@ -1,16 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { 
-  IsNotEmpty, 
-  IsString, 
-  IsNumber, 
-  IsEnum, 
-  IsOptional, 
-  IsBoolean, 
-  IsArray, 
-  Min, 
-  Max 
+import {
+  IsNotEmpty,
+  IsString,
+  IsNumber,
+  IsEnum,
+  IsOptional,
+  IsBoolean,
+  IsArray,
+  Min,
+  Max,
 } from 'class-validator';
-import { SubscriptionType, RecurrencePattern } from '../entities/subscription-plan.entity';
+import {
+  SubscriptionType,
+  RecurrencePattern,
+} from '../entities/subscription-plan.entity';
 
 export class CreateSubscriptionPlanDto {
   @ApiProperty({ example: 'Abonnement Mensuel' })
@@ -27,17 +30,28 @@ export class CreateSubscriptionPlanDto {
   @IsEnum(SubscriptionType)
   type: SubscriptionType;
 
-  @ApiProperty({ example: 1, description: 'Durée de l\'abonnement (selon le type)' })
+  @ApiProperty({
+    example: 1,
+    description: "Durée de l'abonnement (selon le type)",
+  })
   @IsNumber()
   @Min(1)
   duration: number;
 
-  @ApiProperty({ enum: RecurrencePattern, example: RecurrencePattern.NONE, required: false })
+  @ApiProperty({
+    enum: RecurrencePattern,
+    example: RecurrencePattern.NONE,
+    required: false,
+  })
   @IsEnum(RecurrencePattern)
   @IsOptional()
   recurrence?: RecurrencePattern;
 
-  @ApiProperty({ example: [1, 2, 3, 4, 5], description: 'Jours autorisés (0-6, 0 = dimanche)', required: false })
+  @ApiProperty({
+    example: [1, 2, 3, 4, 5],
+    description: 'Jours autorisés (0-6, 0 = dimanche)',
+    required: false,
+  })
   @IsArray()
   @IsOptional()
   allowedDays?: number[];
@@ -52,7 +66,10 @@ export class CreateSubscriptionPlanDto {
   @IsOptional()
   endTime?: string;
 
-  @ApiProperty({ example: 15, description: 'Pourcentage de réduction par rapport au prix horaire' })
+  @ApiProperty({
+    example: 15,
+    description: 'Pourcentage de réduction par rapport au prix horaire',
+  })
   @IsNumber()
   @Min(0)
   @Max(100)

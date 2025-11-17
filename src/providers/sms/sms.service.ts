@@ -10,10 +10,14 @@ export class SmsService {
   private readonly fromNumber: string;
 
   constructor(private configService: ConfigService) {
-    const accountSid = this.configService.get<string>('TWILIO_ACCOUNT_SID') || 'demo-account-sid';
-    const authToken = this.configService.get<string>('TWILIO_AUTH_TOKEN') || 'demo-auth-token';
-    this.fromNumber = this.configService.get<string>('TWILIO_PHONE_NUMBER') || '+15555555555';
-    
+    const accountSid =
+      this.configService.get<string>('TWILIO_ACCOUNT_SID') ||
+      'demo-account-sid';
+    const authToken =
+      this.configService.get<string>('TWILIO_AUTH_TOKEN') || 'demo-auth-token';
+    this.fromNumber =
+      this.configService.get<string>('TWILIO_PHONE_NUMBER') || '+15555555555';
+
     // En mode développement, créez un client mock si les clés ne sont pas fournies
     if (
       accountSid.startsWith('AC') &&
@@ -29,7 +33,6 @@ export class SmsService {
         },
       } as any;
     }
-    
   }
 
   async sendSms(to: string, body: string): Promise<SmsResult> {
@@ -46,7 +49,7 @@ export class SmsService {
       };
     } catch (error) {
       this.logger.error(`Error sending SMS: ${error.message}`, error.stack);
-      
+
       return {
         success: false,
         error: error.message,
@@ -59,12 +62,21 @@ export class SmsService {
     return this.sendSms(to, message);
   }
 
-  async sendBookingConfirmation(to: string, bookingId: string, parkingName: string, date: string): Promise<SmsResult> {
+  async sendBookingConfirmation(
+    to: string,
+    bookingId: string,
+    parkingName: string,
+    date: string,
+  ): Promise<SmsResult> {
     const message = `Votre réservation ParkShare #${bookingId} pour "${parkingName}" le ${date} a été confirmée. Vérifiez l'application pour les détails.`;
     return this.sendSms(to, message);
   }
 
-  async sendAccessCode(to: string, accessCode: string, parkingName: string): Promise<SmsResult> {
+  async sendAccessCode(
+    to: string,
+    accessCode: string,
+    parkingName: string,
+  ): Promise<SmsResult> {
     const message = `Votre code d'accès pour "${parkingName}" est: ${accessCode}. Utilisez-le à l'entrée du parking.`;
     return this.sendSms(to, message);
   }

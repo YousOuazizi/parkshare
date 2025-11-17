@@ -111,7 +111,9 @@ describe('AuthService', () => {
       const result = await service.register(registerDto);
 
       expect(result).toBeDefined();
-      expect(mockUsersService.findByEmail).toHaveBeenCalledWith(registerDto.email);
+      expect(mockUsersService.findByEmail).toHaveBeenCalledWith(
+        registerDto.email,
+      );
       expect(mockUsersService.create).toHaveBeenCalled();
     });
 
@@ -154,7 +156,10 @@ describe('AuthService', () => {
       mockUsersService.findByEmail.mockResolvedValue(mockUser);
       jest.spyOn(bcrypt, 'compare').mockResolvedValue(false as never);
 
-      const result = await service.validateUser(mockUser.email, 'wrongPassword');
+      const result = await service.validateUser(
+        mockUser.email,
+        'wrongPassword',
+      );
 
       expect(result).toBeNull();
     });

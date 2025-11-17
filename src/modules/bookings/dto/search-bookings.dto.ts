@@ -1,10 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { 
-  IsOptional, 
-  IsString, 
-  IsEnum, 
-  IsDateString 
-} from 'class-validator';
+import { IsOptional, IsString, IsEnum, IsDateString } from 'class-validator';
 import { BookingStatus } from '../entities/booking.entity';
 
 export class SearchBookingsDto {

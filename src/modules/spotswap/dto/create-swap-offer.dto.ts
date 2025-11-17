@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { 
-  IsNotEmpty, 
-  IsString, 
-  IsNumber, 
-  IsOptional, 
+import {
+  IsNotEmpty,
+  IsString,
+  IsNumber,
+  IsOptional,
   IsDateString,
-  Min
+  Min,
 } from 'class-validator';
 
 export class CreateSwapOfferDto {
@@ -14,7 +14,10 @@ export class CreateSwapOfferDto {
   @IsNotEmpty()
   listingId: string;
 
-  @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000', required: false })
+  @ApiProperty({
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    required: false,
+  })
   @IsString()
   @IsOptional()
   offerParkingId?: string;
@@ -35,7 +38,10 @@ export class CreateSwapOfferDto {
   @Min(0)
   offerPrice?: number;
 
-  @ApiProperty({ example: 'Je suis intéressé par votre place de parking. Voici ma proposition.' })
+  @ApiProperty({
+    example:
+      'Je suis intéressé par votre place de parking. Voici ma proposition.',
+  })
   @IsString()
   @IsOptional()
   message?: string;

@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsNumber, IsOptional, Min } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsNumber,
+  IsOptional,
+  Min,
+} from 'class-validator';
 
 export class RefundPaymentDto {
   @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000' })
@@ -13,7 +19,10 @@ export class RefundPaymentDto {
   @IsOptional()
   amount?: number;
 
-  @ApiProperty({ example: 'Annulation demandée par le client', required: false })
+  @ApiProperty({
+    example: 'Annulation demandée par le client',
+    required: false,
+  })
   @IsString()
   @IsOptional()
   reason?: string;

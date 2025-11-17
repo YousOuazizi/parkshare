@@ -35,9 +35,7 @@ export const winstonConfig = {
     // Console logs
     new winston.transports.Console({
       format:
-        process.env.NODE_ENV === 'production'
-          ? logFormat
-          : developmentFormat,
+        process.env.NODE_ENV === 'production' ? logFormat : developmentFormat,
     }),
 
     // Error logs - fichier rotatif
@@ -74,7 +72,9 @@ export const winstonConfig = {
   ],
 
   // Niveau de logs selon l'environnement
-  level: process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
+  level:
+    process.env.LOG_LEVEL ||
+    (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
 
   // Ne pas quitter sur erreur
   exitOnError: false,

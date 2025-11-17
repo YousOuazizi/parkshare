@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { 
-  IsNotEmpty, 
-  IsString, 
-  IsEmail, 
-  IsArray, 
-  IsOptional, 
-  IsDateString 
+import {
+  IsNotEmpty,
+  IsString,
+  IsEmail,
+  IsArray,
+  IsOptional,
+  IsDateString,
 } from 'class-validator';
 
 export class ShareSubscriptionDto {
@@ -14,7 +14,11 @@ export class ShareSubscriptionDto {
   @IsNotEmpty()
   email: string;
 
-  @ApiProperty({ example: [1, 2, 3, 4, 5], description: 'Jours autorisés (0-6, 0 = dimanche)', required: false })
+  @ApiProperty({
+    example: [1, 2, 3, 4, 5],
+    description: 'Jours autorisés (0-6, 0 = dimanche)',
+    required: false,
+  })
   @IsArray()
   @IsOptional()
   allowedDays?: number[];

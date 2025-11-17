@@ -1,12 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { 
-  IsNotEmpty, 
-  IsString, 
-  IsNumber, 
-  IsEnum, 
-  IsOptional, 
-  IsObject, 
-  Min 
+import {
+  IsNotEmpty,
+  IsString,
+  IsNumber,
+  IsEnum,
+  IsOptional,
+  IsObject,
+  Min,
 } from 'class-validator';
 import { PaymentMethod } from '../entities/payment.entity';
 

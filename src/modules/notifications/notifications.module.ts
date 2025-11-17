@@ -7,10 +7,7 @@ import { WebsocketsModule } from '../../websockets/websockets.module';
 import { VerificationLevelListener } from '../verification/listeners/verification-level.listener';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Notification]),
-    WebsocketsModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Notification]), WebsocketsModule],
   controllers: [NotificationsController],
   providers: [NotificationsService, VerificationLevelListener],
   exports: [NotificationsService],

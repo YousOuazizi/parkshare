@@ -1,13 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { 
-  IsNotEmpty, 
-  IsString, 
-  IsNumber, 
-  IsOptional, 
-  IsDate, 
-  IsEnum, 
+import {
+  IsNotEmpty,
+  IsString,
+  IsNumber,
+  IsOptional,
+  IsDate,
+  IsEnum,
   IsObject,
-  Min
+  Min,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { AlgorithmType } from '../entities/price-suggestion.entity';

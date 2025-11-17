@@ -60,21 +60,21 @@ export class Parking {
   // })
   // location: string;
 
-  @OneToOne(() => ParkingSize, size => size.parking, { 
-    cascade: true, 
-    eager: true 
+  @OneToOne(() => ParkingSize, (size) => size.parking, {
+    cascade: true,
+    eager: true,
   })
   size: ParkingSize;
 
-  @OneToMany(() => ParkingFeature, feature => feature.parking, { 
-    cascade: true, 
-    eager: true 
+  @OneToMany(() => ParkingFeature, (feature) => feature.parking, {
+    cascade: true,
+    eager: true,
   })
   features: ParkingFeature[];
 
-  @OneToMany(() => ParkingPhoto, photo => photo.parking, { 
-    cascade: true, 
-    eager: true 
+  @OneToMany(() => ParkingPhoto, (photo) => photo.parking, {
+    cascade: true,
+    eager: true,
   })
   photos: ParkingPhoto[];
 
@@ -84,13 +84,13 @@ export class Parking {
   @Column({ default: 'EUR' })
   currency: string;
 
-  @OneToMany(() => AvailabilitySchedule, schedule => schedule.parking, {
+  @OneToMany(() => AvailabilitySchedule, (schedule) => schedule.parking, {
     cascade: true,
     eager: true,
   })
   availabilitySchedules: AvailabilitySchedule[];
 
-  @OneToMany(() => AvailabilityException, exception => exception.parking, {
+  @OneToMany(() => AvailabilityException, (exception) => exception.parking, {
     cascade: true,
     eager: true,
   })
@@ -111,8 +111,8 @@ export class Parking {
 
   @Column({ default: false })
   hasEVCharging: boolean;
-    
-  @OneToMany(() => PriceRule, priceRule => priceRule.parking)
+
+  @OneToMany(() => PriceRule, (priceRule) => priceRule.parking)
   priceRules: PriceRule[];
 
   @CreateDateColumn()
