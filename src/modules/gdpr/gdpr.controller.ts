@@ -8,7 +8,12 @@ import {
   Request,
   Patch,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiParam,
+} from '@nestjs/swagger';
 import { GdprService } from './gdpr.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../core/guards/roles.guard';
@@ -56,9 +61,15 @@ export class GdprController {
   @Post('consent/withdraw/:consentType')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiParam({ name: 'consentType', description: 'Type de consentement à retirer' })
+  @ApiParam({
+    name: 'consentType',
+    description: 'Type de consentement à retirer',
+  })
   @ApiOperation({ summary: 'Retirer un consentement RGPD' })
-  async withdrawConsent(@Request() req, @Param('consentType') consentType: string) {
+  async withdrawConsent(
+    @Request() req,
+    @Param('consentType') consentType: string,
+  ) {
     const ipAddress = req.ip || req.connection.remoteAddress;
     const userAgent = req.headers['user-agent'];
 
@@ -79,19 +90,22 @@ export class GdprController {
   @ApiOperation({
     summary: 'Demander un export de mes données (Article 20 RGPD)',
     description:
-      'Permet à l\'utilisateur de demander un export complet de ses données personnelles. Le fichier sera disponible pendant 7 jours.',
+      "Permet à l'utilisateur de demander un export complet de ses données personnelles. Le fichier sera disponible pendant 7 jours.",
   })
   async requestDataExport(
     @Request() req,
     @Body() requestDataExportDto: RequestDataExportDto,
   ) {
-    return this.gdprService.requestDataExport(req.user.id, requestDataExportDto);
+    return this.gdprService.requestDataExport(
+      req.user.id,
+      requestDataExportDto,
+    );
   }
 
   @Get('data-export/requests')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Obtenir mes demandes d\'export de données' })
+  @ApiOperation({ summary: "Obtenir mes demandes d'export de données" })
   async getMyExportRequests(@Request() req) {
     return this.gdprService.getUserExportRequests(req.user.id);
   }
@@ -99,9 +113,12 @@ export class GdprController {
   @Get('data-export/:requestId/download')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiParam({ name: 'requestId', description: 'ID de la demande d\'export' })
+  @ApiParam({ name: 'requestId', description: "ID de la demande d'export" })
   @ApiOperation({ summary: 'Télécharger mes données exportées' })
-  async downloadExportedData(@Request() req, @Param('requestId') requestId: string) {
+  async downloadExportedData(
+    @Request() req,
+    @Param('requestId') requestId: string,
+  ) {
     // TODO: Vérifier que la demande appartient à l'utilisateur
     return this.gdprService.generateDataExport(requestId);
   }
@@ -113,9 +130,10 @@ export class GdprController {
   @ApiBearerAuth()
   @Throttle({ default: { limit: 2, ttl: 86400000 } }) // 2 demandes par jour max
   @ApiOperation({
-    summary: 'Demander la suppression de mes données (Article 17 RGPD - Droit à l\'oubli)',
+    summary:
+      "Demander la suppression de mes données (Article 17 RGPD - Droit à l'oubli)",
     description:
-      'Permet à l\'utilisateur de demander la suppression complète de ses données. Cette action nécessite une validation manuelle.',
+      "Permet à l'utilisateur de demander la suppression complète de ses données. Cette action nécessite une validation manuelle.",
   })
   async requestDataDeletion(
     @Request() req,
@@ -142,7 +160,9 @@ export class GdprController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
-  @ApiOperation({ summary: '[ADMIN] Obtenir toutes les demandes de suppression' })
+  @ApiOperation({
+    summary: '[ADMIN] Obtenir toutes les demandes de suppression',
+  })
   async getAllDeletionRequests() {
     return this.gdprService.getAllDeletionRequests();
   }
@@ -151,7 +171,10 @@ export class GdprController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
-  @ApiParam({ name: 'requestId', description: 'ID de la demande de suppression' })
+  @ApiParam({
+    name: 'requestId',
+    description: 'ID de la demande de suppression',
+  })
   @ApiOperation({ summary: '[ADMIN] Approuver une demande de suppression' })
   async approveDeletionRequest(
     @Request() req,
@@ -164,7 +187,10 @@ export class GdprController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
-  @ApiParam({ name: 'requestId', description: 'ID de la demande de suppression' })
+  @ApiParam({
+    name: 'requestId',
+    description: 'ID de la demande de suppression',
+  })
   @ApiOperation({ summary: '[ADMIN] Rejeter une demande de suppression' })
   async rejectDeletionRequest(
     @Request() req,
@@ -182,7 +208,10 @@ export class GdprController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
-  @ApiParam({ name: 'requestId', description: 'ID de la demande de suppression' })
+  @ApiParam({
+    name: 'requestId',
+    description: 'ID de la demande de suppression',
+  })
   @ApiOperation({ summary: '[ADMIN] Exécuter la suppression des données' })
   async executeDeletion(@Param('requestId') requestId: string) {
     await this.gdprService.executeDeletion(requestId);

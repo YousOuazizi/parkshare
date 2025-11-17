@@ -70,14 +70,18 @@ function generateAllSecrets(): void {
   if (process.argv.includes('--update-env')) {
     fs.writeFileSync(secretsFilePath, envContent);
     console.log(`✅ Secrets sauvegardés dans ${secretsFilePath}`);
-    console.log('⚠️  IMPORTANT: Ajoutez ces secrets à votre fichier .env et supprimez .env.secrets');
+    console.log(
+      '⚠️  IMPORTANT: Ajoutez ces secrets à votre fichier .env et supprimez .env.secrets',
+    );
     console.log('⚠️  NE COMMITEZ JAMAIS les secrets dans Git !');
   } else {
     console.log('💡 Pour sauvegarder ces secrets, exécutez:');
     console.log('   npm run generate:secrets -- --update-env');
   }
 
-  console.log('\n📝 Copiez ces secrets dans votre fichier .env ou votre gestionnaire de secrets');
+  console.log(
+    '\n📝 Copiez ces secrets dans votre fichier .env ou votre gestionnaire de secrets',
+  );
 }
 
 // Exécuter le script

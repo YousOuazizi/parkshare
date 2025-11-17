@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { 
-  IsNotEmpty, 
-  IsString, 
-  IsOptional, 
-  IsDateString 
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsDateString,
 } from 'class-validator';
 
 export class PauseSubscriptionDto {

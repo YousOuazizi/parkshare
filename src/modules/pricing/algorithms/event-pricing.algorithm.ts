@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { PricingAlgorithm, PricingAlgorithmResult } from './pricing-algorithm.interface';
+import {
+  PricingAlgorithm,
+  PricingAlgorithmResult,
+} from './pricing-algorithm.interface';
 import { BasePricingAlgorithm } from './base-pricing.algorithm';
 
 @Injectable()
@@ -18,20 +21,21 @@ export class EventPricingAlgorithm implements PricingAlgorithm {
       startTime,
       endTime,
     );
-    
+
     // Vérifier si des événements sont fournis dans les données contextuelles
     const events = contextData?.events || [];
     const nearbyEvents = this.filterRelevantEvents(events, startTime, endTime);
-    
+
     // Calculer le facteur d'événement
     let eventFactor = 1.0;
     if (nearbyEvents.length > 0) {
       eventFactor = this.calculateEventFactor(nearbyEvents);
     }
-    
+
     // Mettre à jour le prix suggéré
-    const suggestedPrice = Math.round((baseResult.suggestedPrice * eventFactor) * 100) / 100;
-    
+    const suggestedPrice =
+      Math.round(baseResult.suggestedPrice * eventFactor * 100) / 100;
+
     return {
       suggestedPrice,
       confidenceScore: baseResult.confidenceScore * 0.9, // Légère réduction de la confiance
@@ -43,25 +47,29 @@ export class EventPricingAlgorithm implements PricingAlgorithm {
     };
   }
 
-  private filterRelevantEvents(events: any[], startTime: Date, endTime: Date): any[] {
+  private filterRelevantEvents(
+    events: any[],
+    startTime: Date,
+    endTime: Date,
+  ): any[] {
     // Filtrer les événements qui chevauchent la période de réservation ou sont proches
-    return events.filter(event => {
+    return events.filter((event) => {
       const eventStartTime = new Date(event.startTime);
       const eventEndTime = new Date(event.endTime);
-      
+
       // Chevauchement des périodes
-      const overlaps = (
+      const overlaps =
         (eventStartTime <= endTime && eventStartTime >= startTime) ||
         (eventEndTime >= startTime && eventEndTime <= endTime) ||
-        (eventStartTime <= startTime && eventEndTime >= endTime)
-      );
-      
+        (eventStartTime <= startTime && eventEndTime >= endTime);
+
       // Si l'événement est proche dans le temps (2 heures avant ou après)
-      const closeInTime = (
-        Math.abs(eventStartTime.getTime() - startTime.getTime()) <= 2 * 60 * 60 * 1000 ||
-        Math.abs(eventEndTime.getTime() - endTime.getTime()) <= 2 * 60 * 60 * 1000
-      );
-      
+      const closeInTime =
+        Math.abs(eventStartTime.getTime() - startTime.getTime()) <=
+          2 * 60 * 60 * 1000 ||
+        Math.abs(eventEndTime.getTime() - endTime.getTime()) <=
+          2 * 60 * 60 * 1000;
+
       return overlaps || closeInTime;
     });
   }
@@ -69,25 +77,25 @@ export class EventPricingAlgorithm implements PricingAlgorithm {
   private calculateEventFactor(events: any[]): number {
     // Base du facteur
     let factor = 1.0;
-    
+
     // Parcourir tous les événements et cumuler l'impact
-    events.forEach(event => {
+    events.forEach((event) => {
       // Facteur basé sur la distance
       const distanceFactor = this.getDistanceFactor(event.distance);
-      
+
       // Facteur basé sur la taille de l'événement
       const sizeFactor = this.getSizeFactor(event.expectedAttendance);
-      
+
       // Facteur basé sur le type d'événement
       const typeFactor = this.getEventTypeFactor(event.eventType);
-      
+
       // Combiner les facteurs
       const eventImpact = distanceFactor * sizeFactor * typeFactor;
-      
+
       // Ajouter à l'impact global (avec un cap pour éviter des prix excessifs)
       factor = Math.min(factor + eventImpact, 3.0);
     });
-    
+
     return factor;
   }
 
@@ -99,20 +107,20 @@ export class EventPricingAlgorithm implements PricingAlgorithm {
     return 0.05; // Éloigné
   }
 
-// Suite de src/modules/pricing/algorithms/event-pricing.algorithm.ts
+  // Suite de src/modules/pricing/algorithms/event-pricing.algorithm.ts
 
-private getSizeFactor(attendance: number): number {
+  private getSizeFactor(attendance: number): number {
     if (!attendance) return 1.0;
-    
+
     if (attendance > 10000) return 2.0; // Très grand événement
     if (attendance > 5000) return 1.5; // Grand événement
     if (attendance > 1000) return 1.2; // Événement moyen
     return 1.0; // Petit événement
   }
-  
+
   private getEventTypeFactor(eventType: string): number {
     if (!eventType) return 1.0;
-    
+
     switch (eventType.toLowerCase()) {
       case 'concert':
       case 'festival':
@@ -125,4 +133,4 @@ private getSizeFactor(attendance: number): number {
         return 1.0; // Autres types d'événements
     }
   }
-  }
+}

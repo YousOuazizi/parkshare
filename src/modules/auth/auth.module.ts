@@ -24,7 +24,7 @@ import { VerificationModule } from '../verification/verification.module';
         },
       }),
     }),
-    VerificationModule
+    VerificationModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, JwtStrategy, JwtRefreshStrategy],

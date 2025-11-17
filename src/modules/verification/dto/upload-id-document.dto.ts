@@ -12,7 +12,7 @@ export class UploadIdDocumentDto {
   @ApiProperty({ enum: DocumentType })
   @IsEnum(DocumentType)
   documentType: DocumentType;
-  
+
   @ApiProperty({ required: false })
   @IsString()
   @IsOptional()

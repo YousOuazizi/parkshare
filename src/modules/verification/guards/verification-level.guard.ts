@@ -15,18 +15,21 @@ export class VerificationLevelGuard implements CanActivate {
       'requiredVerificationLevel',
       context.getHandler(),
     );
-    
+
     if (!requiredLevel) {
       return true; // Pas de niveau requis
     }
-    
+
     const request = context.switchToHttp().getRequest();
     const userId = request.user?.id;
-    
+
     if (!userId) {
       return false;
     }
-    
-    return this.verificationService.checkVerificationLevel(userId, requiredLevel);
+
+    return this.verificationService.checkVerificationLevel(
+      userId,
+      requiredLevel,
+    );
   }
 }

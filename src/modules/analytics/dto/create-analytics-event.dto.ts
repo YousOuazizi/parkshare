@@ -1,6 +1,12 @@
 // src/modules/analytics/dto/create-analytics-event.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsOptional, IsString, IsObject } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsObject,
+} from 'class-validator';
 import { AnalyticsEventType } from '../entities/analytics-event.entity';
 
 export class CreateAnalyticsEventDto {

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User, VerificationLevel } from './entities/user.entity';
@@ -15,23 +19,25 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { email, password } = createUserDto;
-  
+
     // Vérifier si l'utilisateur existe déjà
-    const existingUser = await this.usersRepository.findOne({ where: { email } });
+    const existingUser = await this.usersRepository.findOne({
+      where: { email },
+    });
     if (existingUser) {
       throw new ConflictException('Un utilisateur avec cet email existe déjà');
     }
-  
+
     // Hasher le mot de passe
     const hashedPassword = await bcrypt.hash(password, 10);
-  
+
     // Créer et sauvegarder le nouvel utilisateur
     const user = this.usersRepository.create({
       ...createUserDto,
       password: hashedPassword,
       verificationLevel: VerificationLevel.LEVEL_0,
     });
-  
+
     return this.usersRepository.save(user);
   }
 
@@ -41,11 +47,11 @@ export class UsersService {
 
   async findOne(id: string): Promise<User> {
     const user = await this.usersRepository.findOne({ where: { id } });
-    
+
     if (!user) {
       throw new NotFoundException(`Utilisateur avec l'id ${id} non trouvé`);
     }
-    
+
     return user;
   }
 
@@ -55,12 +61,12 @@ export class UsersService {
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id);
-    
+
     // Si le mot de passe est fourni, le hasher
     if (updateUserDto.password) {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
     }
-    
+
     // Mettre à jour l'utilisateur
     const updatedUser = Object.assign(user, updateUserDto);
     return this.usersRepository.save(updatedUser);
@@ -71,7 +77,10 @@ export class UsersService {
     await this.usersRepository.remove(user);
   }
 
-  async setRefreshToken(userId: string, refreshToken: string | null): Promise<void> {
+  async setRefreshToken(
+    userId: string,
+    refreshToken: string | null,
+  ): Promise<void> {
     if (refreshToken) {
       const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
       await this.usersRepository.update(userId, {
@@ -84,7 +93,10 @@ export class UsersService {
     }
   }
 
-  async updateStripeCustomerId(userId: string, stripeCustomerId: string): Promise<User> {
+  async updateStripeCustomerId(
+    userId: string,
+    stripeCustomerId: string,
+  ): Promise<User> {
     await this.usersRepository.update(userId, { stripeCustomerId });
     return this.findOne(userId);
   }

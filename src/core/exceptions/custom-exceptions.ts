@@ -14,7 +14,7 @@ export class BaseAppException extends HttpException {
     status: HttpStatus,
     context?: Record<string, any>,
     correlationId?: string,
-    path?: string
+    path?: string,
   ) {
     super(message, status);
     this.timestamp = new Date().toISOString();
@@ -32,7 +32,7 @@ export class BusinessValidationException extends BaseAppException {
     message: string,
     context?: Record<string, any>,
     correlationId?: string,
-    path?: string
+    path?: string,
   ) {
     super(message, HttpStatus.BAD_REQUEST, context, correlationId, path);
   }
@@ -51,7 +51,7 @@ export class InsufficientPermissionsException extends BaseAppException {
     userPermissions: string[] = [],
     context?: Record<string, any>,
     correlationId?: string,
-    path?: string
+    path?: string,
   ) {
     super(message, HttpStatus.FORBIDDEN, context, correlationId, path);
     this.requiredPermissions = requiredPermissions;
@@ -71,7 +71,7 @@ export class ResourceNotFoundException extends BaseAppException {
     resourceId: string,
     context?: Record<string, any>,
     correlationId?: string,
-    path?: string
+    path?: string,
   ) {
     const message = `${resourceType} with ID '${resourceId}' not found`;
     super(message, HttpStatus.NOT_FOUND, context, correlationId, path);
@@ -91,7 +91,7 @@ export class ResourceConflictException extends BaseAppException {
     conflictType: string,
     context?: Record<string, any>,
     correlationId?: string,
-    path?: string
+    path?: string,
   ) {
     super(message, HttpStatus.CONFLICT, context, correlationId, path);
     this.conflictType = conflictType;
@@ -111,9 +111,10 @@ export class ExternalServiceException extends BaseAppException {
     message?: string,
     context?: Record<string, any>,
     correlationId?: string,
-    path?: string
+    path?: string,
   ) {
-    const errorMessage = message || `External service '${serviceName}' error: ${serviceError}`;
+    const errorMessage =
+      message || `External service '${serviceName}' error: ${serviceError}`;
     super(errorMessage, HttpStatus.BAD_GATEWAY, context, correlationId, path);
     this.serviceName = serviceName;
     this.serviceError = serviceError;
@@ -136,7 +137,7 @@ export class RateLimitException extends BaseAppException {
     resetTime: Date,
     context?: Record<string, any>,
     correlationId?: string,
-    path?: string
+    path?: string,
   ) {
     const message = `Rate limit exceeded for ${limitType}: ${currentCount}/${maxCount}. Resets at ${resetTime.toISOString()}`;
     super(message, HttpStatus.TOO_MANY_REQUESTS, context, correlationId, path);
@@ -162,7 +163,7 @@ export class PaymentException extends BaseAppException {
     errorCode?: string,
     context?: Record<string, any>,
     correlationId?: string,
-    path?: string
+    path?: string,
   ) {
     super(message, HttpStatus.PAYMENT_REQUIRED, context, correlationId, path);
     this.paymentProvider = paymentProvider;
@@ -185,7 +186,7 @@ export class InsufficientVerificationException extends BaseAppException {
     nextSteps: string[] = [],
     context?: Record<string, any>,
     correlationId?: string,
-    path?: string
+    path?: string,
   ) {
     const message = `Insufficient verification level. Current: ${currentLevel}, Required: ${requiredLevel}`;
     super(message, HttpStatus.FORBIDDEN, context, correlationId, path);
@@ -210,9 +211,15 @@ export class FileProcessingException extends BaseAppException {
     message: string,
     context?: Record<string, any>,
     correlationId?: string,
-    path?: string
+    path?: string,
   ) {
-    super(message, HttpStatus.UNPROCESSABLE_ENTITY, context, correlationId, path);
+    super(
+      message,
+      HttpStatus.UNPROCESSABLE_ENTITY,
+      context,
+      correlationId,
+      path,
+    );
     this.fileName = fileName;
     this.fileType = fileType;
     this.processingStep = processingStep;
@@ -232,9 +239,15 @@ export class DatabaseOperationException extends BaseAppException {
     message: string,
     context?: Record<string, any>,
     correlationId?: string,
-    path?: string
+    path?: string,
   ) {
-    super(message, HttpStatus.INTERNAL_SERVER_ERROR, context, correlationId, path);
+    super(
+      message,
+      HttpStatus.INTERNAL_SERVER_ERROR,
+      context,
+      correlationId,
+      path,
+    );
     this.operation = operation;
     this.entity = entity;
   }

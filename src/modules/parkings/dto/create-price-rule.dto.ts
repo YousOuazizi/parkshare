@@ -1,17 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { 
-  IsNotEmpty, 
-  IsString, 
-  IsNumber, 
-  IsOptional, 
-  IsEnum, 
-  IsBoolean, 
-  IsArray, 
-  ValidateNested, 
+import {
+  IsNotEmpty,
+  IsString,
+  IsNumber,
+  IsOptional,
+  IsEnum,
+  IsBoolean,
+  IsArray,
+  ValidateNested,
   IsObject,
   IsDateString,
   Min,
-  Max
+  Max,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PriceRuleType } from '../entities/price-rule.entity';
@@ -38,7 +38,10 @@ export class CreatePriceRuleDto {
   @IsEnum(PriceRuleType)
   type: PriceRuleType;
 
-  @ApiProperty({ example: 1.5, description: 'Multiplicateur de prix (1.5 = +50%, 0.8 = -20%)' })
+  @ApiProperty({
+    example: 1.5,
+    description: 'Multiplicateur de prix (1.5 = +50%, 0.8 = -20%)',
+  })
   @IsNumber()
   @Min(0)
   factor: number;
@@ -58,7 +61,11 @@ export class CreatePriceRuleDto {
   @IsOptional()
   endDate?: string;
 
-  @ApiProperty({ example: [1, 2, 3, 4, 5], description: '0-6, 0 étant dimanche', required: false })
+  @ApiProperty({
+    example: [1, 2, 3, 4, 5],
+    description: '0-6, 0 étant dimanche',
+    required: false,
+  })
   @IsArray()
   @IsOptional()
   daysOfWeek?: number[];
@@ -75,7 +82,10 @@ export class CreatePriceRuleDto {
   @IsOptional()
   isActive?: boolean;
 
-  @ApiProperty({ example: 'Augmentation de prix pour les heures de pointe', required: false })
+  @ApiProperty({
+    example: 'Augmentation de prix pour les heures de pointe',
+    required: false,
+  })
   @IsString()
   @IsOptional()
   description?: string;

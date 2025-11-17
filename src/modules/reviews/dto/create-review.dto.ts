@@ -1,14 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { 
-  IsNotEmpty, 
-  IsString, 
-  IsInt, 
-  IsEnum, 
-  IsUUID, 
-  IsOptional, 
-  IsObject, 
-  Min, 
-  Max 
+import {
+  IsNotEmpty,
+  IsString,
+  IsInt,
+  IsEnum,
+  IsUUID,
+  IsOptional,
+  IsObject,
+  Min,
+  Max,
 } from 'class-validator';
 import { ReviewType } from '../entities/review.entity';
 
@@ -67,12 +67,18 @@ export class CreateReviewDto {
   @IsNotEmpty()
   bookingId: string;
 
-  @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000', required: false })
+  @ApiProperty({
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    required: false,
+  })
   @IsUUID()
   @IsOptional()
   parkingId?: string;
 
-  @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000', required: false })
+  @ApiProperty({
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    required: false,
+  })
   @IsUUID()
   @IsOptional()
   targetUserId?: string;
@@ -83,7 +89,9 @@ export class CreateReviewDto {
   @Max(5)
   rating: number;
 
-  @ApiProperty({ example: 'Très bonne expérience, parking bien situé et facile d\'accès.' })
+  @ApiProperty({
+    example: "Très bonne expérience, parking bien situé et facile d'accès.",
+  })
   @IsString()
   @IsNotEmpty()
   comment: string;

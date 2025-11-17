@@ -1,7 +1,15 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { SubscriptionPlan, SubscriptionType, RecurrencePattern } from './entities/subscription-plan.entity';
+import {
+  SubscriptionPlan,
+  SubscriptionType,
+  RecurrencePattern,
+} from './entities/subscription-plan.entity';
 import { CreateSubscriptionPlanDto } from './dto/create-subscription-plan.dto';
 import { UpdateSubscriptionPlanDto } from './dto/update-subscription-plan.dto';
 
@@ -9,10 +17,12 @@ import { UpdateSubscriptionPlanDto } from './dto/update-subscription-plan.dto';
 export class SubscriptionPlansService {
   constructor(
     @InjectRepository(SubscriptionPlan)
-    private planRepository: Repository<SubscriptionPlan>
+    private planRepository: Repository<SubscriptionPlan>,
   ) {}
 
-  async create(createPlanDto: CreateSubscriptionPlanDto): Promise<SubscriptionPlan> {
+  async create(
+    createPlanDto: CreateSubscriptionPlanDto,
+  ): Promise<SubscriptionPlan> {
     const plan = this.planRepository.create(createPlanDto);
     return this.planRepository.save(plan);
   }
@@ -21,30 +31,35 @@ export class SubscriptionPlansService {
     if (isActive !== undefined) {
       return this.planRepository.find({
         where: { isActive },
-        order: { discountPercentage: 'DESC' }
+        order: { discountPercentage: 'DESC' },
       });
     }
-    
+
     return this.planRepository.find({
-      order: { discountPercentage: 'DESC' }
+      order: { discountPercentage: 'DESC' },
     });
   }
 
   async findOne(id: string): Promise<SubscriptionPlan> {
     const plan = await this.planRepository.findOne({
-      where: { id }
+      where: { id },
     });
-    
+
     if (!plan) {
-      throw new NotFoundException(`Plan d'abonnement avec l'id ${id} non trouvé`);
+      throw new NotFoundException(
+        `Plan d'abonnement avec l'id ${id} non trouvé`,
+      );
     }
-    
+
     return plan;
   }
 
-  async update(id: string, updatePlanDto: UpdateSubscriptionPlanDto): Promise<SubscriptionPlan> {
+  async update(
+    id: string,
+    updatePlanDto: UpdateSubscriptionPlanDto,
+  ): Promise<SubscriptionPlan> {
     const plan = await this.findOne(id);
-    
+
     const updatedPlan = Object.assign(plan, updatePlanDto);
     return this.planRepository.save(updatedPlan);
   }
@@ -57,14 +72,16 @@ export class SubscriptionPlansService {
   async findByType(type: SubscriptionType): Promise<SubscriptionPlan[]> {
     return this.planRepository.find({
       where: { type, isActive: true },
-      order: { discountPercentage: 'DESC' }
+      order: { discountPercentage: 'DESC' },
     });
   }
 
-  async findByRecurrence(recurrence: RecurrencePattern): Promise<SubscriptionPlan[]> {
+  async findByRecurrence(
+    recurrence: RecurrencePattern,
+  ): Promise<SubscriptionPlan[]> {
     return this.planRepository.find({
       where: { recurrence, isActive: true },
-      order: { discountPercentage: 'DESC' }
+      order: { discountPercentage: 'DESC' },
     });
   }
 }

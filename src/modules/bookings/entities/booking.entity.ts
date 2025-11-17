@@ -73,7 +73,7 @@ export class Booking {
   @Column({ nullable: true })
   checkedOutTime: Date;
 
-  @OneToMany(() => AppliedPriceRule, rule => rule.booking, {
+  @OneToMany(() => AppliedPriceRule, (rule) => rule.booking, {
     cascade: true,
     eager: true,
   })

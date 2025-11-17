@@ -1,4 +1,10 @@
-import { Injectable, BadRequestException, NotFoundException, ConflictException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  ConflictException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -49,7 +55,10 @@ export class VerificationService {
       throw new NotFoundException('Token de vérification invalide');
     }
 
-    if (!user.emailVerificationExpires || user.emailVerificationExpires < new Date()) {
+    if (
+      !user.emailVerificationExpires ||
+      user.emailVerificationExpires < new Date()
+    ) {
       throw new BadRequestException('Token de vérification expiré');
     }
 
@@ -58,11 +67,18 @@ export class VerificationService {
     user.verified = true;
     user.emailVerificationToken = null;
     user.emailVerificationExpires = null;
-    user.verificationLevel = Math.max(user.verificationLevel, VerificationLevel.LEVEL_1);
+    user.verificationLevel = Math.max(
+      user.verificationLevel,
+      VerificationLevel.LEVEL_1,
+    );
 
     const savedUser = await this.userRepository.save(user);
 
-    this.emitVerificationLevelChange(user.id, previousLevel, savedUser.verificationLevel);
+    this.emitVerificationLevelChange(
+      user.id,
+      previousLevel,
+      savedUser.verificationLevel,
+    );
 
     return savedUser;
   }
@@ -97,7 +113,10 @@ export class VerificationService {
       throw new BadRequestException('Code de vérification incorrect');
     }
 
-    if (!user.phoneVerificationExpires || user.phoneVerificationExpires < new Date()) {
+    if (
+      !user.phoneVerificationExpires ||
+      user.phoneVerificationExpires < new Date()
+    ) {
       throw new BadRequestException('Code de vérification expiré');
     }
 
@@ -106,11 +125,18 @@ export class VerificationService {
     user.phoneVerified = true;
     user.phoneVerificationCode = null;
     user.phoneVerificationExpires = null;
-    user.verificationLevel = Math.max(user.verificationLevel, VerificationLevel.LEVEL_2);
+    user.verificationLevel = Math.max(
+      user.verificationLevel,
+      VerificationLevel.LEVEL_2,
+    );
 
     const savedUser = await this.userRepository.save(user);
 
-    this.emitVerificationLevelChange(user.id, previousLevel, savedUser.verificationLevel);
+    this.emitVerificationLevelChange(
+      user.id,
+      previousLevel,
+      savedUser.verificationLevel,
+    );
 
     return savedUser;
   }
@@ -125,7 +151,9 @@ export class VerificationService {
     const user = await this.usersService.findOne(userId);
 
     if (user.verificationLevel < VerificationLevel.LEVEL_2) {
-      throw new UnauthorizedException('Vous devez d\'abord vérifier votre téléphone');
+      throw new UnauthorizedException(
+        "Vous devez d'abord vérifier votre téléphone",
+      );
     }
 
     const uploadResult = await this.storageService.uploadFile(
@@ -161,39 +189,57 @@ export class VerificationService {
     const admin = await this.usersService.findOne(adminId);
 
     if (admin.role !== 'admin') {
-      throw new UnauthorizedException('Vous n\'êtes pas autorisé à effectuer cette action');
+      throw new UnauthorizedException(
+        "Vous n'êtes pas autorisé à effectuer cette action",
+      );
     }
 
     if (!user.idDocumentFront || !user.idDocumentBack || !user.selfieImage) {
-      throw new BadRequestException('Tous les documents requis n\'ont pas été fournis');
+      throw new BadRequestException(
+        "Tous les documents requis n'ont pas été fournis",
+      );
     }
 
     const previousLevel = user.verificationLevel;
 
     user.idVerified = true;
-    user.verificationLevel = Math.max(user.verificationLevel, VerificationLevel.LEVEL_3);
+    user.verificationLevel = Math.max(
+      user.verificationLevel,
+      VerificationLevel.LEVEL_3,
+    );
 
     const savedUser = await this.userRepository.save(user);
 
-    this.emitVerificationLevelChange(user.id, previousLevel, savedUser.verificationLevel);
+    this.emitVerificationLevelChange(
+      user.id,
+      previousLevel,
+      savedUser.verificationLevel,
+    );
 
     return savedUser;
   }
 
-  async approveAdvancedVerification(userId: string, adminId: string): Promise<User> {
+  async approveAdvancedVerification(
+    userId: string,
+    adminId: string,
+  ): Promise<User> {
     const user = await this.usersService.findOne(userId);
     const admin = await this.usersService.findOne(adminId);
 
     if (admin.role !== 'admin') {
-      throw new UnauthorizedException('Vous n\'êtes pas autorisé à effectuer cette action');
+      throw new UnauthorizedException(
+        "Vous n'êtes pas autorisé à effectuer cette action",
+      );
     }
 
     if (!user.idVerified) {
-      throw new BadRequestException('La vérification d\'identité doit être approuvée d\'abord');
+      throw new BadRequestException(
+        "La vérification d'identité doit être approuvée d'abord",
+      );
     }
 
     if (!user.addressProofDocument) {
-      throw new BadRequestException('Une preuve d\'adresse est requise');
+      throw new BadRequestException("Une preuve d'adresse est requise");
     }
 
     const previousLevel = user.verificationLevel;
@@ -203,12 +249,19 @@ export class VerificationService {
 
     const savedUser = await this.userRepository.save(user);
 
-    this.emitVerificationLevelChange(user.id, previousLevel, savedUser.verificationLevel);
+    this.emitVerificationLevelChange(
+      user.id,
+      previousLevel,
+      savedUser.verificationLevel,
+    );
 
     return savedUser;
   }
 
-  async checkVerificationLevel(userId: string, requiredLevel: VerificationLevel): Promise<boolean> {
+  async checkVerificationLevel(
+    userId: string,
+    requiredLevel: VerificationLevel,
+  ): Promise<boolean> {
     const user = await this.usersService.findOne(userId);
     return user.verificationLevel >= requiredLevel;
   }
@@ -244,16 +297,27 @@ export class VerificationService {
     }
 
     if (user.verificationLevel < VerificationLevel.LEVEL_3) {
-      if (!user.idDocumentFront) steps.push('Téléchargez le recto de votre pièce d\'identité');
-      if (!user.idDocumentBack) steps.push('Téléchargez le verso de votre pièce d\'identité');
-      if (!user.selfieImage) steps.push('Téléchargez un selfie avec votre pièce d\'identité');
-      if (user.idDocumentFront && user.idDocumentBack && user.selfieImage && !user.idVerified) {
-        steps.push('En attente de vérification de votre identité par notre équipe');
+      if (!user.idDocumentFront)
+        steps.push("Téléchargez le recto de votre pièce d'identité");
+      if (!user.idDocumentBack)
+        steps.push("Téléchargez le verso de votre pièce d'identité");
+      if (!user.selfieImage)
+        steps.push("Téléchargez un selfie avec votre pièce d'identité");
+      if (
+        user.idDocumentFront &&
+        user.idDocumentBack &&
+        user.selfieImage &&
+        !user.idVerified
+      ) {
+        steps.push(
+          'En attente de vérification de votre identité par notre équipe',
+        );
       }
     }
 
     if (user.verificationLevel < VerificationLevel.LEVEL_4) {
-      if (!user.addressProofDocument) steps.push('Téléchargez un justificatif de domicile');
+      if (!user.addressProofDocument)
+        steps.push('Téléchargez un justificatif de domicile');
       if (user.addressProofDocument && !user.advancedVerified) {
         steps.push('En attente de vérification avancée par notre équipe');
       }
@@ -262,7 +326,11 @@ export class VerificationService {
     return steps;
   }
 
-  private emitVerificationLevelChange(userId: string, previousLevel: VerificationLevel, newLevel: VerificationLevel) {
+  private emitVerificationLevelChange(
+    userId: string,
+    previousLevel: VerificationLevel,
+    newLevel: VerificationLevel,
+  ) {
     if (previousLevel !== newLevel) {
       this.eventEmitter.emit(
         'verification.level_changed',

@@ -66,7 +66,7 @@ export class Review {
   @Column({ nullable: true })
   replyDate: Date;
 
-  @OneToOne(() => ReviewCriteria, criteria => criteria.review, {
+  @OneToOne(() => ReviewCriteria, (criteria) => criteria.review, {
     cascade: true,
     eager: true,
   })

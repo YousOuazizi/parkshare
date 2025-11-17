@@ -17,7 +17,12 @@ import { UpdateBookingDto } from './dto/update-booking.dto';
 import { SearchBookingsDto } from './dto/search-bookings.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { BookingStatus } from './entities/booking.entity';
-import { ApiBearerAuth, ApiOperation, ApiTags, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiTags,
+  ApiQuery,
+} from '@nestjs/swagger';
 // import { any } from 'src/core/interfaces/request-with-user.interface';
 import { ParkingsService } from '../parkings/services/parkings.service';
 import { VerificationLevel } from '../users/entities/user.entity';
@@ -28,7 +33,7 @@ import { RequiredVerificationLevel } from '../verification/decorators/required-v
 export class BookingsController {
   constructor(
     private readonly bookingsService: BookingsService,
-    private readonly parkingsService: ParkingsService
+    private readonly parkingsService: ParkingsService,
   ) {}
 
   @Post()
@@ -67,19 +72,18 @@ export class BookingsController {
       throw new ForbiddenException('Utilisateur non authentifié');
     }
     const booking = await this.bookingsService.findOne(id);
-    
+
     // Vérifier les permissions
-    if (
-      booking.userId !== req.user.id && 
-      req.user.role !== 'admin'
-    ) {
+    if (booking.userId !== req.user.id && req.user.role !== 'admin') {
       // Vérifier si l'utilisateur est le propriétaire du parking
       const parking = await this.parkingsService.findOne(booking.parkingId);
       if (parking.ownerId !== req.user.id) {
-        throw new ForbiddenException('Vous n\'êtes pas autorisé à voir cette réservation');
+        throw new ForbiddenException(
+          "Vous n'êtes pas autorisé à voir cette réservation",
+        );
       }
     }
-    
+
     return booking;
   }
 
@@ -97,13 +101,18 @@ export class BookingsController {
       throw new ForbiddenException('Utilisateur non authentifié');
     }
     const isAdmin = req.user.role === 'admin';
-    return this.bookingsService.update(id, req.user.id, updateBookingDto, isAdmin);
+    return this.bookingsService.update(
+      id,
+      req.user.id,
+      updateBookingDto,
+      isAdmin,
+    );
   }
 
   @Patch(':id/status')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Mettre à jour le statut d\'une réservation' })
+  @ApiOperation({ summary: "Mettre à jour le statut d'une réservation" })
   @ApiQuery({ name: 'status', enum: BookingStatus })
   updateStatus(
     @Param('id') id: string,
@@ -133,7 +142,7 @@ export class BookingsController {
   @Post(':id/check-in')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Effectuer le check-in d\'une réservation' })
+  @ApiOperation({ summary: "Effectuer le check-in d'une réservation" })
   checkIn(@Param('id') id: string, @Req() req: any) {
     if (!req.user) {
       throw new ForbiddenException('Utilisateur non authentifié');
@@ -145,7 +154,7 @@ export class BookingsController {
   @Post(':id/check-out')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Effectuer le check-out d\'une réservation' })
+  @ApiOperation({ summary: "Effectuer le check-out d'une réservation" })
   checkOut(@Param('id') id: string, @Req() req: any) {
     if (!req.user) {
       throw new ForbiddenException('Utilisateur non authentifié');
@@ -157,7 +166,7 @@ export class BookingsController {
   @Post(':id/access-code')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Générer un code d\'accès pour une réservation' })
+  @ApiOperation({ summary: "Générer un code d'accès pour une réservation" })
   generateAccessCode(@Param('id') id: string, @Req() req: any) {
     if (!req.user) {
       throw new ForbiddenException('Utilisateur non authentifié');
@@ -169,7 +178,9 @@ export class BookingsController {
   @Get('stats/user')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Obtenir les statistiques de réservation d\'un utilisateur' })
+  @ApiOperation({
+    summary: "Obtenir les statistiques de réservation d'un utilisateur",
+  })
   getUserStats(@Req() req: any) {
     if (!req.user) {
       throw new ForbiddenException('Utilisateur non authentifié');
@@ -181,21 +192,25 @@ export class BookingsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @RequiredVerificationLevel(VerificationLevel.LEVEL_2)
-  @ApiOperation({ summary: 'Obtenir les statistiques de réservation d\'un parking' })
-  async getParkingStats(@Param('parkingId') parkingId: string, @Req() req: any) {
+  @ApiOperation({
+    summary: "Obtenir les statistiques de réservation d'un parking",
+  })
+  async getParkingStats(
+    @Param('parkingId') parkingId: string,
+    @Req() req: any,
+  ) {
     if (!req.user) {
       throw new ForbiddenException('Utilisateur non authentifié');
     }
     // Vérifier si l'utilisateur est le propriétaire du parking ou admin
     const parking = await this.parkingsService.findOne(parkingId);
-    
-    if (
-      parking.ownerId !== req.user.id && 
-      req.user.role !== 'admin'
-    ) {
-      throw new ForbiddenException('Vous n\'êtes pas autorisé à voir ces statistiques');
+
+    if (parking.ownerId !== req.user.id && req.user.role !== 'admin') {
+      throw new ForbiddenException(
+        "Vous n'êtes pas autorisé à voir ces statistiques",
+      );
     }
-    
+
     return this.bookingsService.getParkingStats(parkingId);
   }
 }

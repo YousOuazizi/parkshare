@@ -50,10 +50,14 @@ export class Notification {
   @Index()
   read: boolean;
 
-  @OneToOne(() => NotificationData, notificationData => notificationData.notification, {
-    cascade: true,
-    eager: true,
-  })
+  @OneToOne(
+    () => NotificationData,
+    (notificationData) => notificationData.notification,
+    {
+      cascade: true,
+      eager: true,
+    },
+  )
   notificationData: NotificationData;
 
   @Column({ nullable: true })

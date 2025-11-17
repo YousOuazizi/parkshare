@@ -66,11 +66,14 @@ export class AnalyticsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: "Obtenir les statistiques d'un parking" })
-  async getParkingStats(@Param('parkingId') parkingId: string, @Req() req: any) {
+  async getParkingStats(
+    @Param('parkingId') parkingId: string,
+    @Req() req: any,
+  ) {
     if (!req.user) {
       throw new ForbiddenException('Utilisateur non authentifié');
     }
-    
+
     // Vérifier si l'utilisateur est le propriétaire du parking ou un admin
     const parking = await this.parkingsService.findOne(parkingId);
 

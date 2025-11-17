@@ -44,14 +44,20 @@ export class SecretsConfig {
       '123456',
     ];
 
-    if (forbiddenDefaults.some((forbidden) => secret.toLowerCase().includes(forbidden))) {
-      errors.push('Le secret ne doit pas contenir de valeurs par défaut connues');
+    if (
+      forbiddenDefaults.some((forbidden) =>
+        secret.toLowerCase().includes(forbidden),
+      )
+    ) {
+      errors.push(
+        'Le secret ne doit pas contenir de valeurs par défaut connues',
+      );
     }
 
     // Entropie minimale
     const entropy = SecretsConfig.calculateEntropy(secret);
     if (entropy < 3.5) {
-      errors.push('Le secret manque d\'entropie (trop répétitif)');
+      errors.push("Le secret manque d'entropie (trop répétitif)");
     }
 
     return {
@@ -217,15 +223,21 @@ export function validateSecretsMiddleware(): void {
     }
 
     console.error('💡 Pour générer un secret fort, utilisez:');
-    console.error('   node -e "console.log(require(\'crypto\').randomBytes(64).toString(\'base64url\'))"');
+    console.error(
+      "   node -e \"console.log(require('crypto').randomBytes(64).toString('base64url'))\"",
+    );
     console.error('');
 
     // En production, refuser le démarrage
     if (process.env.NODE_ENV === 'production') {
-      console.error('🛑 L\'application ne peut pas démarrer avec des secrets faibles en production.');
+      console.error(
+        "🛑 L'application ne peut pas démarrer avec des secrets faibles en production.",
+      );
       process.exit(1);
     } else {
-      console.warn('⚠️  ATTENTION: L\'application démarre avec des secrets faibles (développement uniquement)');
+      console.warn(
+        "⚠️  ATTENTION: L'application démarre avec des secrets faibles (développement uniquement)",
+      );
     }
   } else {
     console.log('✅ Tous les secrets sont valides');

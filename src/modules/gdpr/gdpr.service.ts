@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserConsent } from './entities/user-consent.entity';
@@ -86,7 +90,12 @@ export class GdprService {
   /**
    * Retirer un consentement
    */
-  async withdrawConsent(userId: string, consentType: string, ipAddress: string, userAgent: string): Promise<UserConsent> {
+  async withdrawConsent(
+    userId: string,
+    consentType: string,
+    ipAddress: string,
+    userAgent: string,
+  ): Promise<UserConsent> {
     const consent = this.consentRepository.create({
       userId,
       consentType,
@@ -115,7 +124,7 @@ export class GdprService {
 
     if (existingRequest) {
       throw new BadRequestException(
-        'Une demande d\'export est déjà en cours de traitement',
+        "Une demande d'export est déjà en cours de traitement",
       );
     }
 
@@ -144,7 +153,7 @@ export class GdprService {
     });
 
     if (!request) {
-      throw new NotFoundException('Demande d\'export introuvable');
+      throw new NotFoundException("Demande d'export introuvable");
     }
 
     await this.exportRepository.update(requestId, { status: 'PROCESSING' });
@@ -241,7 +250,10 @@ export class GdprService {
   /**
    * Approuver une demande de suppression (Admin)
    */
-  async approveDeletionRequest(requestId: string, adminId: string): Promise<DataDeletionRequest> {
+  async approveDeletionRequest(
+    requestId: string,
+    adminId: string,
+  ): Promise<DataDeletionRequest> {
     const request = await this.deletionRepository.findOne({
       where: { id: requestId },
     });
@@ -258,9 +270,13 @@ export class GdprService {
     // TODO: Déclencher le processus de suppression
     // this.eventEmitter.emit('gdpr.deletion.approved', { requestId });
 
-    const updated = await this.deletionRepository.findOne({ where: { id: requestId } });
+    const updated = await this.deletionRepository.findOne({
+      where: { id: requestId },
+    });
     if (!updated) {
-      throw new NotFoundException('Demande de suppression introuvable après mise à jour');
+      throw new NotFoundException(
+        'Demande de suppression introuvable après mise à jour',
+      );
     }
     return updated;
   }
@@ -287,9 +303,13 @@ export class GdprService {
       rejectionReason,
     });
 
-    const updated = await this.deletionRepository.findOne({ where: { id: requestId } });
+    const updated = await this.deletionRepository.findOne({
+      where: { id: requestId },
+    });
     if (!updated) {
-      throw new NotFoundException('Demande de suppression introuvable après mise à jour');
+      throw new NotFoundException(
+        'Demande de suppression introuvable après mise à jour',
+      );
     }
     return updated;
   }
@@ -304,7 +324,7 @@ export class GdprService {
 
     if (!request || request.status !== 'APPROVED') {
       throw new BadRequestException(
-        'La demande n\'est pas approuvée ou introuvable',
+        "La demande n'est pas approuvée ou introuvable",
       );
     }
 
@@ -354,7 +374,9 @@ export class GdprService {
   /**
    * Obtenir les demandes de suppression d'un utilisateur
    */
-  async getUserDeletionRequests(userId: string): Promise<DataDeletionRequest[]> {
+  async getUserDeletionRequests(
+    userId: string,
+  ): Promise<DataDeletionRequest[]> {
     return await this.deletionRepository.find({
       where: { userId },
       order: { createdAt: 'DESC' },

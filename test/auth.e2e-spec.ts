@@ -85,14 +85,12 @@ describe('AuthController (e2e)', () => {
       const email = `duplicate${Date.now()}@example.com`;
 
       // First registration
-      await request(app.getHttpServer())
-        .post('/api/auth/register')
-        .send({
-          email,
-          password: 'Password123!',
-          firstName: 'Test',
-          lastName: 'User',
-        });
+      await request(app.getHttpServer()).post('/api/auth/register').send({
+        email,
+        password: 'Password123!',
+        firstName: 'Test',
+        lastName: 'User',
+      });
 
       // Second registration with same email
       return request(app.getHttpServer())
@@ -132,7 +130,7 @@ describe('AuthController (e2e)', () => {
   });
 
   describe('/api/auth/login (POST)', () => {
-    let testUser = {
+    const testUser = {
       email: `logintest${Date.now()}@example.com`,
       password: 'LoginPassword123!',
     };

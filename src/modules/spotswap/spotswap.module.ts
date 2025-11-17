@@ -15,23 +15,19 @@ import { SwapTransactionsController } from './swap-transactions.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      SwapListing,
-      SwapOffer,
-      SwapTransaction
-    ]),
+    TypeOrmModule.forFeature([SwapListing, SwapOffer, SwapTransaction]),
     ParkingsModule,
     UsersModule,
     NotificationsModule,
     PaymentsModule,
-    SubscriptionsModule
+    SubscriptionsModule,
   ],
   controllers: [
     SwapListingsController,
     SwapOffersController,
-    SwapTransactionsController
+    SwapTransactionsController,
   ],
   providers: [SpotSwapService],
-  exports: [SpotSwapService]
+  exports: [SpotSwapService],
 })
 export class SpotSwapModule {}
