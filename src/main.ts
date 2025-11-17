@@ -8,9 +8,14 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import * as compression from 'compression';
 import * as cookieParser from 'cookie-parser';
+import { validateSecretsMiddleware } from './config/secrets.config';
 // import { VerificationRequirementsInterceptor } from './core/interceptors/verification-requirements.interceptor';
 
 async function bootstrap() {
+  // Valider les secrets au démarrage
+  console.log('🔐 Validation des secrets...');
+  validateSecretsMiddleware();
+
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   
@@ -69,6 +74,9 @@ async function bootstrap() {
   .addTag('analytics')
   .addTag('pricing')
   .addTag('verification', 'Vérification progressive des utilisateurs')
+  .addTag('gdpr', 'Conformité RGPD - Gestion des données personnelles')
+  .addTag('health', 'Health checks et monitoring')
+  .addTag('metrics', 'Métriques système')
   .addBearerAuth()
   .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
