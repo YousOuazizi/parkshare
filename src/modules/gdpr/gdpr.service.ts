@@ -258,7 +258,11 @@ export class GdprService {
     // TODO: Déclencher le processus de suppression
     // this.eventEmitter.emit('gdpr.deletion.approved', { requestId });
 
-    return await this.deletionRepository.findOne({ where: { id: requestId } });
+    const updated = await this.deletionRepository.findOne({ where: { id: requestId } });
+    if (!updated) {
+      throw new NotFoundException('Demande de suppression introuvable après mise à jour');
+    }
+    return updated;
   }
 
   /**
@@ -283,7 +287,11 @@ export class GdprService {
       rejectionReason,
     });
 
-    return await this.deletionRepository.findOne({ where: { id: requestId } });
+    const updated = await this.deletionRepository.findOne({ where: { id: requestId } });
+    if (!updated) {
+      throw new NotFoundException('Demande de suppression introuvable après mise à jour');
+    }
+    return updated;
   }
 
   /**
@@ -315,10 +323,7 @@ export class GdprService {
           email: `deleted_${request.userId}@parkshare.com`,
           firstName: 'Deleted',
           lastName: 'User',
-          phone: null,
-          password: null,
-          refreshToken: null,
-        });
+        } as any);
 
         // Supprimer les données sensibles
         // TODO: Supprimer photos, documents, etc.
