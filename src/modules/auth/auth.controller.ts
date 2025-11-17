@@ -6,6 +6,7 @@ import {
     UseGuards,
     Request,
   } from '@nestjs/common';
+  import { Throttle } from '@nestjs/throttler';
   import { AuthService } from './auth.service';
   import { LocalAuthGuard } from './guards/local-auth.guard';
   import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -13,20 +14,22 @@ import {
   import { RegisterDto } from './dto/register.dto';
   import { LoginDto } from './dto/login.dto';
   import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-  
+
   @ApiTags('auth')
   @Controller('auth')
   export class AuthController {
     constructor(private authService: AuthService) {}
-  
+
     @Post('register')
+    @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 inscriptions max par minute
     @ApiOperation({ summary: 'Inscription d\'un nouvel utilisateur' })
     register(@Body() registerDto: RegisterDto) {
       return this.authService.register(registerDto);
     }
-  
+
     @UseGuards(LocalAuthGuard)
     @Post('login')
+    @Throttle({ default: { limit: 10, ttl: 60000 } }) // 10 tentatives de connexion max par minute
     @ApiOperation({ summary: 'Connexion d\'un utilisateur' })
     login(@Body() loginDto: LoginDto, @Request() req) {
       return this.authService.login(req.user);
