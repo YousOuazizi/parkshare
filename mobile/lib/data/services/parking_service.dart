@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import '../../core/network/dio_client.dart';
 import '../../core/network/api_endpoints.dart';
 import '../models/parking_model.dart';
+import '../models/create_parking_dto.dart';
 
 class ParkingService {
   final DioClient _dioClient;
