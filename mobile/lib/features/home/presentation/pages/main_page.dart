@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../../core/theme/app_theme.dart';
 import 'home_tab.dart';
-import '../../../map/presentation/pages/map_tab.dart';
+import '../../../map/presentation/pages/map_tab_v2.dart';
 import '../../../booking/presentation/pages/bookings_tab.dart';
 import '../../../profile/presentation/pages/profile_tab.dart';
 
@@ -18,7 +18,7 @@ class _MainPageState extends State<MainPage> {
 
   final List<Widget> _pages = const [
     HomeTab(),
-    MapTab(),
+    MapTabV2(),
     BookingsTab(),
     ProfileTab(),
   ];
