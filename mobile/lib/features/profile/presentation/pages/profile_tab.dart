@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/providers/auth_provider.dart';
+import '../../../../core/providers/booking_provider.dart';
 
-class ProfileTab extends StatelessWidget {
+class ProfileTab extends ConsumerWidget {
   const ProfileTab({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authProvider);
+    final user = authState.user;
+    final bookingsAsync = ref.watch(bookingsProvider);
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -37,15 +43,24 @@ class ProfileTab extends StatelessWidget {
                               ),
                             ],
                           ),
-                          child: const Center(
-                            child: Text(
-                              'JD',
-                              style: TextStyle(
-                                fontSize: 36,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
+                          child: Center(
+                            child: user?.avatarUrl != null
+                                ? ClipOval(
+                                    child: Image.network(
+                                      user!.avatarUrl!,
+                                      width: 100,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                : Text(
+                                    _getInitials(user?.firstName, user?.lastName),
+                                    style: const TextStyle(
+                                      fontSize: 36,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                           ),
                         ),
                         Positioned(
@@ -74,7 +89,7 @@ class ProfileTab extends StatelessWidget {
 
                     // Name
                     Text(
-                      'John Doe',
+                      '${user?.firstName ?? ''} ${user?.lastName ?? ''}',
                       style:
                           Theme.of(context).textTheme.headlineMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
@@ -88,7 +103,7 @@ class ProfileTab extends StatelessWidget {
 
                     // Email
                     Text(
-                      'john.doe@example.com',
+                      user?.email ?? '',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Colors.grey.shade600,
                           ),
@@ -100,25 +115,53 @@ class ProfileTab extends StatelessWidget {
                     const SizedBox(height: 20),
 
                     // Stats
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _StatItem(
-                          icon: Icons.bookmark_rounded,
-                          value: '12',
-                          label: 'Réservations',
-                        ),
-                        _StatItem(
-                          icon: Icons.star_rounded,
-                          value: '4.8',
-                          label: 'Note',
-                        ),
-                        _StatItem(
-                          icon: Icons.local_parking_rounded,
-                          value: '3',
-                          label: 'Parkings',
-                        ),
-                      ],
+                    bookingsAsync.when(
+                      data: (bookings) => Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _StatItem(
+                            icon: Icons.bookmark_rounded,
+                            value: bookings.length.toString(),
+                            label: 'Réservations',
+                          ),
+                          _StatItem(
+                            icon: Icons.star_rounded,
+                            value: user?.averageRating?.toStringAsFixed(1) ?? '0.0',
+                            label: 'Note',
+                          ),
+                          _StatItem(
+                            icon: Icons.local_parking_rounded,
+                            value: '0', // TODO: Get from parking owner count
+                            label: 'Parkings',
+                          ),
+                        ],
+                      ),
+                      loading: () => const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          CircularProgressIndicator(),
+                        ],
+                      ),
+                      error: (_, __) => Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _StatItem(
+                            icon: Icons.bookmark_rounded,
+                            value: '0',
+                            label: 'Réservations',
+                          ),
+                          _StatItem(
+                            icon: Icons.star_rounded,
+                            value: '0.0',
+                            label: 'Note',
+                          ),
+                          _StatItem(
+                            icon: Icons.local_parking_rounded,
+                            value: '0',
+                            label: 'Parkings',
+                          ),
+                        ],
+                      ),
                     )
                         .animate()
                         .fadeIn(delay: 400.ms, duration: 600.ms)
@@ -147,14 +190,22 @@ class ProfileTab extends StatelessWidget {
                     icon: Icons.notifications_outlined,
                     title: 'Notifications',
                     onTap: () {
-                      // TODO: Navigate to notifications settings
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Paramètres de notifications bientôt disponibles'),
+                        ),
+                      );
                     },
                   ),
                   _MenuItem(
                     icon: Icons.security_rounded,
                     title: 'Sécurité',
                     onTap: () {
-                      // TODO: Navigate to security settings
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Paramètres de sécurité bientôt disponibles'),
+                        ),
+                      );
                     },
                   ),
                 ],
@@ -169,21 +220,21 @@ class ProfileTab extends StatelessWidget {
                     icon: Icons.add_circle_outline,
                     title: 'Ajouter un parking',
                     onTap: () {
-                      // TODO: Navigate to add parking
+                      context.go('/parking/add');
                     },
                   ),
                   _MenuItem(
                     icon: Icons.local_parking_outlined,
                     title: 'Gérer mes parkings',
                     onTap: () {
-                      // TODO: Navigate to manage parkings
+                      context.go('/parking/manage');
                     },
                   ),
                   _MenuItem(
                     icon: Icons.analytics_outlined,
                     title: 'Statistiques',
                     onTap: () {
-                      // TODO: Navigate to analytics
+                      context.go('/analytics/owner-dashboard');
                     },
                   ),
                 ],
@@ -200,7 +251,11 @@ class ProfileTab extends StatelessWidget {
                     trailing: Switch(
                       value: false,
                       onChanged: (value) {
-                        // TODO: Toggle theme
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Thème sombre bientôt disponible'),
+                          ),
+                        );
                       },
                       activeColor: AppTheme.primaryColor,
                     ),
@@ -216,7 +271,11 @@ class ProfileTab extends StatelessWidget {
                       ),
                     ),
                     onTap: () {
-                      // TODO: Change language
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Changement de langue bientôt disponible'),
+                        ),
+                      );
                     },
                   ),
                 ],
@@ -231,28 +290,52 @@ class ProfileTab extends StatelessWidget {
                     icon: Icons.help_outline,
                     title: 'Centre d\'aide',
                     onTap: () {
-                      // TODO: Navigate to help center
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Centre d\'aide bientôt disponible'),
+                        ),
+                      );
                     },
                   ),
                   _MenuItem(
                     icon: Icons.privacy_tip_outlined,
                     title: 'Politique de confidentialité',
                     onTap: () {
-                      // TODO: Navigate to privacy policy
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Politique de confidentialité bientôt disponible'),
+                        ),
+                      );
                     },
                   ),
                   _MenuItem(
                     icon: Icons.description_outlined,
                     title: 'Conditions d\'utilisation',
                     onTap: () {
-                      // TODO: Navigate to terms of service
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Conditions d\'utilisation bientôt disponibles'),
+                        ),
+                      );
                     },
                   ),
                   _MenuItem(
                     icon: Icons.info_outline,
                     title: 'À propos',
                     onTap: () {
-                      // TODO: Show about dialog
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('À propos de ParkShare'),
+                          content: const Text('ParkShare v1.0.0\n\nL\'application de partage de places de parking la plus innovante.'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Fermer'),
+                            ),
+                          ],
+                        ),
+                      );
                     },
                   ),
                 ],
@@ -267,9 +350,34 @@ class ProfileTab extends StatelessWidget {
                   width: double.infinity,
                   height: 56,
                   child: OutlinedButton.icon(
-                    onPressed: () {
-                      // TODO: Logout
-                      context.go('/login');
+                    onPressed: () async {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Déconnexion'),
+                          content: const Text('Voulez-vous vraiment vous déconnecter ?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text('Annuler'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppTheme.errorColor,
+                              ),
+                              child: const Text('Déconnecter'),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (confirm == true && context.mounted) {
+                        await ref.read(authProvider.notifier).logout();
+                        if (context.mounted) {
+                          context.go('/login');
+                        }
+                      }
                     },
                     icon: const Icon(Icons.logout_rounded),
                     label: const Text('Se déconnecter'),
@@ -290,6 +398,17 @@ class ProfileTab extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _getInitials(String? firstName, String? lastName) {
+    final first = (firstName ?? '').trim();
+    final last = (lastName ?? '').trim();
+
+    if (first.isEmpty && last.isEmpty) return 'U';
+    if (first.isEmpty) return last[0].toUpperCase();
+    if (last.isEmpty) return first[0].toUpperCase();
+
+    return '${first[0]}${last[0]}'.toUpperCase();
   }
 }
 

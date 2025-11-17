@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/providers/booking_provider.dart';
+import '../../../../data/models/booking_model.dart';
 
-class BookingsTab extends StatefulWidget {
+class BookingsTab extends ConsumerStatefulWidget {
   const BookingsTab({super.key});
 
   @override
-  State<BookingsTab> createState() => _BookingsTabState();
+  ConsumerState<BookingsTab> createState() => _BookingsTabState();
 }
 
-class _BookingsTabState extends State<BookingsTab>
+class _BookingsTabState extends ConsumerState<BookingsTab>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
@@ -49,7 +54,11 @@ class _BookingsTabState extends State<BookingsTab>
                   IconButton(
                     icon: const Icon(Icons.filter_list_rounded),
                     onPressed: () {
-                      // TODO: Open filter
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Filtres bientôt disponibles'),
+                        ),
+                      );
                     },
                   )
                       .animate()
@@ -109,81 +118,109 @@ class _BookingsTabState extends State<BookingsTab>
   }
 
   Widget _buildActiveBookings() {
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      itemCount: 3,
-      itemBuilder: (context, index) {
-        return _BookingCard(
-          parkingName: 'Parking Centre Ville ${index + 1}',
-          address: '${10 + index} Rue de la Paix, Paris',
-          date: '15 Dec 2024',
-          time: '10:00 - 12:00',
-          price: '7.00',
-          status: 'active',
-          index: index,
+    final activeBookingsAsync = ref.watch(activeBookingsProvider);
+
+    return activeBookingsAsync.when(
+      data: (bookings) {
+        if (bookings.isEmpty) {
+          return const Center(
+            child: Text('Aucune réservation active'),
+          );
+        }
+        return ListView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          itemCount: bookings.length,
+          itemBuilder: (context, index) {
+            final booking = bookings[index];
+            return _BookingCard(
+              booking: booking,
+              status: 'active',
+              index: index,
+            );
+          },
         );
       },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(
+        child: Text('Erreur: ${error.toString()}'),
+      ),
     );
   }
 
   Widget _buildPastBookings() {
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      itemCount: 5,
-      itemBuilder: (context, index) {
-        return _BookingCard(
-          parkingName: 'Parking Gare ${index + 1}',
-          address: '${20 + index} Avenue de la Gare, Paris',
-          date: '${5 + index} Dec 2024',
-          time: '14:00 - 16:00',
-          price: '6.00',
-          status: 'completed',
-          index: index,
+    final pastBookingsAsync = ref.watch(pastBookingsProvider);
+
+    return pastBookingsAsync.when(
+      data: (bookings) {
+        if (bookings.isEmpty) {
+          return const Center(
+            child: Text('Aucune réservation passée'),
+          );
+        }
+        return ListView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          itemCount: bookings.length,
+          itemBuilder: (context, index) {
+            final booking = bookings[index];
+            return _BookingCard(
+              booking: booking,
+              status: 'completed',
+              index: index,
+            );
+          },
         );
       },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(
+        child: Text('Erreur: ${error.toString()}'),
+      ),
     );
   }
 
   Widget _buildCancelledBookings() {
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      itemCount: 2,
-      itemBuilder: (context, index) {
-        return _BookingCard(
-          parkingName: 'Parking Bastille ${index + 1}',
-          address: '${30 + index} Place de la Bastille, Paris',
-          date: '${1 + index} Dec 2024',
-          time: '09:00 - 11:00',
-          price: '8.00',
-          status: 'cancelled',
-          index: index,
+    final cancelledBookingsAsync = ref.watch(cancelledBookingsProvider);
+
+    return cancelledBookingsAsync.when(
+      data: (bookings) {
+        if (bookings.isEmpty) {
+          return const Center(
+            child: Text('Aucune réservation annulée'),
+          );
+        }
+        return ListView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          itemCount: bookings.length,
+          itemBuilder: (context, index) {
+            final booking = bookings[index];
+            return _BookingCard(
+              booking: booking,
+              status: 'cancelled',
+              index: index,
+            );
+          },
         );
       },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(
+        child: Text('Erreur: ${error.toString()}'),
+      ),
     );
   }
 }
 
-class _BookingCard extends StatelessWidget {
-  final String parkingName;
-  final String address;
-  final String date;
-  final String time;
-  final String price;
+class _BookingCard extends ConsumerWidget {
+  final BookingModel booking;
   final String status; // active, completed, cancelled
   final int index;
 
   const _BookingCard({
-    required this.parkingName,
-    required this.address,
-    required this.date,
-    required this.time,
-    required this.price,
+    required this.booking,
     required this.status,
     required this.index,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     Color statusColor;
     String statusText;
     IconData statusIcon;
@@ -209,6 +246,12 @@ class _BookingCard extends StatelessWidget {
         statusText = 'Inconnu';
         statusIcon = Icons.help_rounded;
     }
+
+    final dateFormatter = DateFormat('dd MMM yyyy', 'fr_FR');
+    final timeFormatter = DateFormat('HH:mm');
+    final startTime = timeFormatter.format(booking.startTime);
+    final endTime = timeFormatter.format(booking.endTime);
+    final dateStr = dateFormatter.format(booking.startTime);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -262,7 +305,7 @@ class _BookingCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'ID: #${1000 + index}',
+                  'ID: #${booking.id.substring(0, 8)}',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey.shade600,
@@ -275,7 +318,7 @@ class _BookingCard extends StatelessWidget {
 
             // Parking name
             Text(
-              parkingName,
+              booking.parkingName,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -293,7 +336,7 @@ class _BookingCard extends StatelessWidget {
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
-                    address,
+                    booking.parkingAddress,
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey.shade600,
@@ -314,7 +357,7 @@ class _BookingCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  date,
+                  dateStr,
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey.shade700,
@@ -329,7 +372,7 @@ class _BookingCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  time,
+                  '$startTime - $endTime',
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey.shade700,
@@ -345,7 +388,7 @@ class _BookingCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '€$price',
+                  '€${booking.totalPrice.toStringAsFixed(2)}',
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -356,8 +399,31 @@ class _BookingCard extends StatelessWidget {
                   Row(
                     children: [
                       OutlinedButton(
-                        onPressed: () {
-                          // TODO: Cancel booking
+                        onPressed: () async {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Annuler la réservation'),
+                              content: const Text('Voulez-vous vraiment annuler cette réservation ?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, false),
+                                  child: const Text('Non'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  child: const Text('Oui'),
+                                ),
+                              ],
+                            ),
+                          );
+                          if (confirm == true) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Annulation en cours...'),
+                              ),
+                            );
+                          }
                         },
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
@@ -370,7 +436,7 @@ class _BookingCard extends StatelessWidget {
                       const SizedBox(width: 8),
                       ElevatedButton(
                         onPressed: () {
-                          // TODO: View details
+                          context.go('/booking/${booking.id}');
                         },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
@@ -385,7 +451,7 @@ class _BookingCard extends StatelessWidget {
                 else if (status == 'completed')
                   ElevatedButton.icon(
                     onPressed: () {
-                      // TODO: Rate parking
+                      context.go('/parking/${booking.parkingId}?showReview=true');
                     },
                     icon: const Icon(Icons.star_outline, size: 18),
                     label: const Text('Noter'),

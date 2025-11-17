@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/providers/auth_provider.dart';
+import '../../../../core/providers/parking_provider.dart';
 import '../widgets/search_bar_widget.dart';
 import '../widgets/category_chip_widget.dart';
 import '../widgets/parking_card_widget.dart';
 import '../widgets/featured_parking_card.dart';
 
-class HomeTab extends StatefulWidget {
+class HomeTab extends ConsumerStatefulWidget {
   const HomeTab({super.key});
 
   @override
-  State<HomeTab> createState() => _HomeTabState();
+  ConsumerState<HomeTab> createState() => _HomeTabState();
 }
 
-class _HomeTabState extends State<HomeTab> {
+class _HomeTabState extends ConsumerState<HomeTab> {
   final List<String> _categories = [
     'Tous',
     'À proximité',
@@ -28,6 +31,10 @@ class _HomeTabState extends State<HomeTab> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+    final parkingsAsync = ref.watch(parkingsProvider);
+    final userName = authState.user?.firstName ?? 'Utilisateur';
+
     return Scaffold(
       body: SafeArea(
         child: CustomScrollView(
@@ -47,7 +54,7 @@ class _HomeTabState extends State<HomeTab> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Bonjour, John 👋',
+                              'Bonjour, $userName 👋',
                               style: Theme.of(context)
                                   .textTheme
                                   .headlineMedium
@@ -105,7 +112,11 @@ class _HomeTabState extends State<HomeTab> {
                               ],
                             ),
                             onPressed: () {
-                              // TODO: Navigate to notifications
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Notifications bientôt disponibles'),
+                                ),
+                              );
                             },
                           ),
                         )
@@ -171,7 +182,7 @@ class _HomeTabState extends State<HomeTab> {
                     ),
                     TextButton(
                       onPressed: () {
-                        // TODO: Navigate to all featured
+                        context.go('/main', extra: 1); // Navigate to map tab
                       },
                       child: const Text('Voir tout'),
                     ),
@@ -187,29 +198,48 @@ class _HomeTabState extends State<HomeTab> {
             SliverToBoxAdapter(
               child: SizedBox(
                 height: 260,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  itemCount: 5,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 16),
-                      child: FeaturedParkingCard(
-                        imageUrl: 'https://picsum.photos/seed/$index/400/300',
-                        name: 'Parking Centre Ville ${index + 1}',
-                        address: '${10 + index} Rue de la Paix, Paris',
-                        price: '${3 + index}.50',
-                        rating: 4.5 + (index * 0.1),
-                        distance: '${0.5 + (index * 0.2)} km',
-                        onTap: () {
-                          context.go('/parking/${index + 1}');
-                        },
-                      )
-                          .animate()
-                          .fadeIn(delay: (600 + index * 100).ms, duration: 600.ms)
-                          .slideX(begin: 0.2, end: 0),
+                child: parkingsAsync.when(
+                  data: (parkings) {
+                    final featuredParkings = parkings.take(5).toList();
+                    if (featuredParkings.isEmpty) {
+                      return const Center(
+                        child: Text('Aucun parking disponible'),
+                      );
+                    }
+                    return ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      itemCount: featuredParkings.length,
+                      itemBuilder: (context, index) {
+                        final parking = featuredParkings[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 16),
+                          child: FeaturedParkingCard(
+                            imageUrl: parking.images.isNotEmpty
+                                ? parking.images.first
+                                : 'https://picsum.photos/seed/${parking.id}/400/300',
+                            name: parking.name,
+                            address: parking.address,
+                            price: parking.pricePerHour.toStringAsFixed(2),
+                            rating: parking.averageRating,
+                            distance: '0.5 km', // TODO: Calculate from user location
+                            onTap: () {
+                              context.go('/parking/${parking.id}');
+                            },
+                          )
+                              .animate()
+                              .fadeIn(delay: (600 + index * 100).ms, duration: 600.ms)
+                              .slideX(begin: 0.2, end: 0),
+                        );
+                      },
                     );
                   },
+                  loading: () => const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                  error: (error, stack) => Center(
+                    child: Text('Erreur: ${error.toString()}'),
+                  ),
                 ),
               ),
             ),
@@ -232,7 +262,7 @@ class _HomeTabState extends State<HomeTab> {
                     ),
                     TextButton(
                       onPressed: () {
-                        // TODO: Navigate to map view
+                        context.go('/main', extra: 1); // Navigate to map tab
                       },
                       child: const Text('Voir sur la carte'),
                     ),
@@ -245,32 +275,66 @@ class _HomeTabState extends State<HomeTab> {
             ),
 
             // Nearby parkings list
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: ParkingCardWidget(
-                        imageUrl: 'https://picsum.photos/seed/${index + 10}/400/300',
-                        name: 'Parking Gare ${index + 1}',
-                        address: '${20 + index} Avenue de la Gare, Paris',
-                        price: '${4 + index}.00',
-                        rating: 4.3 + (index * 0.15),
-                        distance: '${1.0 + (index * 0.3)} km',
-                        isAvailable: index % 3 != 0,
-                        features: const ['Couvert', 'Sécurisé', '24/7'],
-                        onTap: () {
-                          context.go('/parking/${index + 10}');
-                        },
-                      )
-                          .animate()
-                          .fadeIn(delay: (1100 + index * 100).ms, duration: 600.ms)
-                          .slideY(begin: 0.2, end: 0),
-                    );
-                  },
-                  childCount: 10,
+            parkingsAsync.when(
+              data: (parkings) {
+                final nearbyParkings = parkings.skip(5).take(10).toList();
+                if (nearbyParkings.isEmpty) {
+                  return const SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Center(
+                        child: Text('Aucun parking à proximité'),
+                      ),
+                    ),
+                  );
+                }
+                return SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final parking = nearbyParkings[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: ParkingCardWidget(
+                            imageUrl: parking.images.isNotEmpty
+                                ? parking.images.first
+                                : 'https://picsum.photos/seed/${parking.id}/400/300',
+                            name: parking.name,
+                            address: parking.address,
+                            price: parking.pricePerHour.toStringAsFixed(2),
+                            rating: parking.averageRating,
+                            distance: '1.0 km', // TODO: Calculate from user location
+                            isAvailable: parking.isActive,
+                            features: parking.features,
+                            onTap: () {
+                              context.go('/parking/${parking.id}');
+                            },
+                          )
+                              .animate()
+                              .fadeIn(delay: (1100 + index * 100).ms, duration: 600.ms)
+                              .slideY(begin: 0.2, end: 0),
+                        );
+                      },
+                      childCount: nearbyParkings.length,
+                    ),
+                  ),
+                );
+              },
+              loading: () => const SliverToBoxAdapter(
+                child: Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(40),
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+              ),
+              error: (error, stack) => SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Center(
+                    child: Text('Erreur: ${error.toString()}'),
+                  ),
                 ),
               ),
             ),

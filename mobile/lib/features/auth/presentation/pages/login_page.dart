@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/providers/auth_provider.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -29,13 +31,27 @@ class _LoginPageState extends State<LoginPage> {
 
     setState(() => _isLoading = true);
 
-    // TODO: Implement login logic
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      await ref.read(authProvider.notifier).login(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
 
-    setState(() => _isLoading = false);
+      setState(() => _isLoading = false);
 
-    if (!mounted) return;
-    context.go('/main');
+      if (!mounted) return;
+      context.go('/main');
+    } catch (e) {
+      setState(() => _isLoading = false);
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceAll('Exception: ', '')),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -168,7 +184,11 @@ class _LoginPageState extends State<LoginPage> {
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () {
-                      // TODO: Implement forgot password
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Fonctionnalité bientôt disponible'),
+                        ),
+                      );
                     },
                     child: const Text('Mot de passe oublié ?'),
                   ),
@@ -232,7 +252,11 @@ class _LoginPageState extends State<LoginPage> {
                         icon: Icons.g_mobiledata_rounded,
                         label: 'Google',
                         onPressed: () {
-                          // TODO: Implement Google login
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Connexion Google bientôt disponible'),
+                            ),
+                          );
                         },
                       ),
                     ),
@@ -242,7 +266,11 @@ class _LoginPageState extends State<LoginPage> {
                         icon: Icons.apple_rounded,
                         label: 'Apple',
                         onPressed: () {
-                          // TODO: Implement Apple login
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Connexion Apple bientôt disponible'),
+                            ),
+                          );
                         },
                       ),
                     ),
