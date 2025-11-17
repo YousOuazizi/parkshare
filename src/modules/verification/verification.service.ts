@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, NotFoundException, ConflictException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, ConflictException, UnauthorizedException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -7,11 +7,14 @@ import { UsersService } from '../users/users.service';
 import { SmsService } from '../../providers/sms/sms.service';
 import { StorageService } from '../../providers/storage/storage.service';
 import { VerificationLevelChangedEvent } from './events/verification-level-changed.event';
-import { v4 as uuidv4 } from 'uuid';
 import { DocumentType } from './dto/upload-id-document.dto';
+import { CryptoUtils } from '../../core/utils/crypto.utils';
+import { VERIFICATION } from '../../core/constants/business-rules.constants';
 
 @Injectable()
 export class VerificationService {
+  private readonly logger = new Logger(VerificationService.name);
+
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
@@ -28,16 +31,21 @@ export class VerificationService {
       throw new ConflictException('Email déjà vérifié');
     }
 
-    const token = uuidv4();
+    // Use secure token generation
+    const token = CryptoUtils.generateEmailVerificationToken();
     const expires = new Date();
-    expires.setHours(expires.getHours() + 24);
+    expires.setHours(expires.getHours() + VERIFICATION.EMAIL_TOKEN_EXPIRY_HOURS);
 
     await this.userRepository.update(userId, {
       emailVerificationToken: token,
       emailVerificationExpires: expires,
     });
 
-    console.log(`Email de vérification pour ${user.email}: ${token}`);
+    // Log without sensitive data
+    this.logger.log(`Email verification requested for user ${userId}`);
+
+    // TODO: Send verification email via email service
+    // await this.emailService.sendVerificationEmail(user.email, token);
   }
 
   async verifyEmail(token: string): Promise<User> {
@@ -74,9 +82,10 @@ export class VerificationService {
       throw new ConflictException('Téléphone déjà vérifié');
     }
 
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    // Use cryptographically secure random code generation
+    const code = CryptoUtils.generatePhoneVerificationCode();
     const expires = new Date();
-    expires.setMinutes(expires.getMinutes() + 10);
+    expires.setMinutes(expires.getMinutes() + VERIFICATION.PHONE_CODE_EXPIRY_MINUTES);
 
     if (user.phone !== phone) {
       user.phone = phone;
@@ -88,6 +97,9 @@ export class VerificationService {
 
     await this.userRepository.save(user);
     await this.smsService.sendVerificationCode(phone, code);
+
+    // Log without sensitive data
+    this.logger.log(`Phone verification requested for user ${userId}`);
   }
 
   async verifyPhone(userId: string, code: string): Promise<User> {

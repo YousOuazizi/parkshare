@@ -53,7 +53,13 @@ export const environmentValidationSchema = Joi.object({
       Joi.string().uri(),
       Joi.array().items(Joi.string().uri())
     )
-    .default('*'),
+    .default('*')
+    .when('NODE_ENV', {
+      is: 'production',
+      then: Joi.invalid('*').messages({
+        'any.invalid': 'CORS_ORIGIN cannot be wildcard (*) in production for security',
+      }),
+    }),
 
   // External Services
   STRIPE_SECRET_KEY: Joi.string()
@@ -109,6 +115,13 @@ export const environmentValidationSchema = Joi.object({
       is: Joi.exist(),
       then: Joi.required(),
       otherwise: Joi.optional(),
+    }),
+
+  // HERE Maps API (for geolocation)
+  HERE_API_KEY: Joi.string()
+    .optional()
+    .messages({
+      'string.base': 'HERE_API_KEY must be a valid API key',
     }),
 
   // Rate Limiting
@@ -175,4 +188,31 @@ export const environmentValidationSchema = Joi.object({
     .default(6379),
   REDIS_PASSWORD: Joi.string()
     .optional(),
-});
+
+  // WebSocket CORS
+  WS_CORS_ORIGIN: Joi.alternatives()
+    .try(
+      Joi.string().valid('*'),
+      Joi.string().uri(),
+      Joi.array().items(Joi.string().uri())
+    )
+    .default('*')
+    .when('NODE_ENV', {
+      is: 'production',
+      then: Joi.invalid('*').messages({
+        'any.invalid': 'WS_CORS_ORIGIN cannot be wildcard (*) in production for security',
+      }),
+    }),
+})
+  .custom((value, helpers) => {
+    // Custom validation: JWT secrets must be different
+    if (value.JWT_SECRET && value.JWT_REFRESH_SECRET) {
+      if (value.JWT_SECRET === value.JWT_REFRESH_SECRET) {
+        return helpers.error('jwt.secrets.same');
+      }
+    }
+    return value;
+  }, 'JWT Secrets Different Validation')
+  .messages({
+    'jwt.secrets.same': 'JWT_SECRET and JWT_REFRESH_SECRET must be different for security',
+  });

@@ -27,7 +27,7 @@ export class AuthService {
     return null;
   }
 
-  async login(user: any) {
+  async login(user: User) {
     const tokens = await this.getTokens(user.id, user.email, user.role, user.verificationLevel);
     await this.usersService.setRefreshToken(user.id, tokens.refreshToken);
     

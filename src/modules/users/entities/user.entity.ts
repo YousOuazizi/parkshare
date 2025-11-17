@@ -50,6 +50,7 @@ export class User {
     enum: UserRole,
     default: UserRole.USER,
   })
+  @Index() // Index for role-based queries
   role: UserRole;
 
   @Column({ type: 'boolean', default: false })
@@ -60,6 +61,7 @@ export class User {
     enum: VerificationLevel,
     default: VerificationLevel.LEVEL_0,
   })
+  @Index() // Index for verification level filtering
   verificationLevel: VerificationLevel;
 
   @Column({ type: 'text', nullable: true })
@@ -67,6 +69,7 @@ export class User {
   refreshToken: string | null;
 
   @Column({ type: 'varchar', nullable: true })
+  @Index() // Index for Stripe customer lookups
   @Exclude({ toPlainOnly: true })
   stripeCustomerId: string;
   

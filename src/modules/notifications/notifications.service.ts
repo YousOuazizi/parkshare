@@ -17,13 +17,20 @@ export class NotificationsService {
   async create(createNotificationDto: CreateNotificationDto): Promise<Notification> {
     const notification = this.notificationsRepository.create(createNotificationDto);
     const savedNotification = await this.notificationsRepository.save(notification);
-    
+
     // Envoyer la notification en temps réel via WebSockets
     this.eventsGateway.sendNotificationToUser(
       savedNotification.userId,
-      savedNotification
+      {
+        id: savedNotification.id,
+        type: savedNotification.type as any, // Entity uses different NotificationType
+        title: savedNotification.title,
+        content: savedNotification.content,
+        timestamp: savedNotification.createdAt,
+        isRead: savedNotification.read,
+      }
     );
-    
+
     return savedNotification;
   }
 

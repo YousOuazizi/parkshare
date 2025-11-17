@@ -1,7 +1,7 @@
-import { 
-  Injectable, 
-  NotFoundException, 
-  ForbiddenException, 
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
   ConflictException,
   BadRequestException
 } from '@nestjs/common';
@@ -15,6 +15,7 @@ import { ParkingsService } from '../parkings/services/parkings.service';
 import { PriceRulesService } from '../parkings/services/price-rules.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { NotificationType } from '../notifications/entities/notification.entity';
+import { CryptoUtils } from '../../core/utils/crypto.utils';
 
 @Injectable()
 export class BookingsService {
@@ -441,13 +442,13 @@ export class BookingsService {
     if (booking.status !== BookingStatus.CONFIRMED) {
       throw new BadRequestException('Seule une réservation confirmée peut avoir un code d\'accès');
     }
-    
-    // Générer un code aléatoire (6 chiffres)
-    const accessCode = Math.floor(100000 + Math.random() * 900000).toString();
-    
+
+    // Générer un code sécurisé cryptographiquement (6 chiffres)
+    const accessCode = CryptoUtils.generateAccessCode();
+
     // Enregistrer le code
     booking.accessCode = accessCode;
-    
+
     return this.bookingsRepository.save(booking);
   }
   

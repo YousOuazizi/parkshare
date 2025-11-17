@@ -22,16 +22,21 @@ export enum BookingStatus {
 }
 
 @Entity('bookings')
+@Index(['userId', 'status']) // Composite index for user's bookings by status
+@Index(['parkingId', 'status']) // Composite index for parking's bookings by status
+@Index(['startTime', 'endTime']) // Range queries for availability
 export class Booking {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
+  @Index() // Index for user lookups
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   userId: string;
 
   @Column()
+  @Index() // Index for parking lookups
   @ManyToOne(() => Parking, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'parkingId' })
   parkingId: string;

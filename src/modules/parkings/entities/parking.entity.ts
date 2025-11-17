@@ -27,11 +27,15 @@ export enum AccessMethod {
 }
 
 @Entity('parkings')
+@Index(['ownerId', 'isActive']) // Composite index for owner's active parkings
+@Index(['latitude', 'longitude']) // Geospatial search (will be replaced by PostGIS spatial index)
+@Index(['basePrice']) // Price range queries
 export class Parking {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
+  @Index() // Index for owner lookups
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'ownerId' })
   ownerId: string;
@@ -104,9 +108,11 @@ export class Parking {
   accessMethod: AccessMethod;
 
   @Column({ default: true })
+  @Index() // Index for active listings
   isActive: boolean;
 
   @Column({ default: false })
+  @Index() // Index for verified listings
   isVerified: boolean;
 
   @Column({ default: false })
