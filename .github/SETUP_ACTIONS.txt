@@ -1,0 +1,45 @@
+╔════════════════════════════════════════════════════╗
+║     SETUP GITHUB ACTIONS - GUIDE RAPIDE           ║
+╚════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────┐
+│  OPTION 1 : AUTOMATIQUE (2 minutes)                 │
+└─────────────────────────────────────────────────────┘
+
+   ./ops/scripts/setup-github-actions.sh
+
+   Le script fait TOUT pour vous !
+
+
+┌─────────────────────────────────────────────────────┐
+│  OPTION 2 : MANUEL (30 secondes)                    │
+└─────────────────────────────────────────────────────┘
+
+   1. Allez sur :
+      https://github.com/YousOuazizi/parkshare/settings/actions
+
+   2. Workflow permissions → "Read and write"
+
+   3. Cochez "Allow GitHub Actions to..."
+
+   4. Cliquez "Save"
+
+   ✅ TERMINÉ !
+
+
+┌─────────────────────────────────────────────────────┐
+│  VÉRIFIER                                           │
+└─────────────────────────────────────────────────────┘
+
+   Voir les workflows :
+   https://github.com/YousOuazizi/parkshare/actions
+
+
+┌─────────────────────────────────────────────────────┐
+│  DOCUMENTATION COMPLÈTE                             │
+└─────────────────────────────────────────────────────┘
+
+   docs/QUICK_GITHUB_SETUP.md
+   docs/GITHUB_ACTIONS_GUIDE.md
+   docs/GITHUB_SECRETS_SETUP.md
+
