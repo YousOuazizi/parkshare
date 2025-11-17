@@ -2,11 +2,44 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class AppTheme {
+  // Primary Colors
   static const Color primaryColor = Color(0xFF6C63FF);
+  static const Color primaryLight = Color(0xFF8F87FF);
+  static const Color primaryDark = Color(0xFF5A52D5);
+
+  // Secondary Colors
   static const Color secondaryColor = Color(0xFF03DAC6);
+  static const Color secondaryLight = Color(0xFF66FFF9);
+  static const Color secondaryDark = Color(0xFF00B8A9);
+
+  // Semantic Colors
   static const Color errorColor = Color(0xFFFF6B6B);
   static const Color successColor = Color(0xFF51CF66);
   static const Color warningColor = Color(0xFFFFA94D);
+  static const Color infoColor = Color(0xFF4DABF7);
+
+  // Neutral Colors (Modern 2025)
+  static const Color neutral50 = Color(0xFFFAFAFA);
+  static const Color neutral100 = Color(0xFFF5F5F5);
+  static const Color neutral200 = Color(0xFFEEEEEE);
+  static const Color neutral300 = Color(0xFFE0E0E0);
+  static const Color neutral400 = Color(0xFFBDBDBD);
+  static const Color neutral500 = Color(0xFF9E9E9E);
+  static const Color neutral600 = Color(0xFF757575);
+  static const Color neutral700 = Color(0xFF616161);
+  static const Color neutral800 = Color(0xFF424242);
+  static const Color neutral900 = Color(0xFF212121);
+
+  // Surface & Background
+  static const Color surfaceLight = Color(0xFFFFFFFF);
+  static const Color surfaceDim = Color(0xFFF8F9FA);
+  static const Color surfaceBright = Color(0xFFFFFFFF);
+  static const Color surfaceContainer = Color(0xFFF3F4F6);
+  static const Color surfaceContainerHigh = Color(0xFFE5E7EB);
+
+  // Glassmorphism
+  static const Color glassLight = Color(0xCCFFFFFF); // 80% opacity white
+  static const Color glassDark = Color(0xB31F2937); // 70% opacity dark
 
   // Gradients
   static const LinearGradient primaryGradient = LinearGradient(
@@ -19,6 +52,27 @@ class AppTheme {
     colors: [Color(0xFF03DAC6), Color(0xFF00B8A9)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
+  );
+
+  // Modern Gradient Overlays (2025 trend)
+  static const LinearGradient meshGradient = LinearGradient(
+    colors: [
+      Color(0xFF6C63FF),
+      Color(0xFF03DAC6),
+      Color(0xFF8F87FF),
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient shimmerGradient = LinearGradient(
+    colors: [
+      Color(0xFFE0E0E0),
+      Color(0xFFF5F5F5),
+      Color(0xFFE0E0E0),
+    ],
+    begin: Alignment(-1.0, 0.0),
+    end: Alignment(1.0, 0.0),
   );
 
   // Light Theme
